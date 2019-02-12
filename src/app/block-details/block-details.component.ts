@@ -51,7 +51,7 @@ export class BlockDetailsComponent implements OnInit, OnDestroy {
     if (this.info) {
       this.height = this.info.height;
       this.powDifficulty = this.info.difficulty;
-      this.totalCoins = this.info.total_coins;
+      this.totalCoins = this.info.already_generated_coins;
       this.txCount = this.info.tx_count;
       this.NetworkHashrate = this.info.current_network_hashrate_350;
     }

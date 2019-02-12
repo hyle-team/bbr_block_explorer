@@ -1,44 +1,37 @@
-import {Component, OnInit, AfterViewInit, OnDestroy} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router, Event, NavigationEnd} from '@angular/router';
 import {MobileNavState} from './http.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  providers: [],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    providers: [],
 })
-export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
-  navIsOpen: boolean;
-  constructor(
-    private router: Router,
-    private mobileNavState: MobileNavState) {
-    this.navIsOpen = true;
+export class AppComponent implements OnInit {
+    navIsOpen: boolean;
 
-    router.events.subscribe( (event: Event) => {
-      if (event instanceof NavigationEnd) {
-        if (this.navIsOpen === true) {
-          this.mobileNavState.toggleMenu();
-        }
-      }
-    });
-  }
+    constructor(
+        private router: Router,
+        private mobileNavState: MobileNavState) {
+        this.navIsOpen = true;
 
-  ngOnInit() {
-    this.mobileNavState.change.subscribe(navIsOpen => {
-      this.navIsOpen = navIsOpen;
-    });
-  }
-  btnToggleMenu() {
-    this.mobileNavState.toggleMenu();
-  }
+        router.events.subscribe((event: Event) => {
+            if (event instanceof NavigationEnd) {
+                if (this.navIsOpen === true) {
+                    this.mobileNavState.toggleMenu();
+                }
+            }
+        });
+    }
 
-  ngAfterViewInit() {
+    ngOnInit() {
+        this.mobileNavState.change.subscribe(navIsOpen => {
+            this.navIsOpen = navIsOpen;
+        });
+    }
 
-  }
-
-  ngOnDestroy() {
-
-  }
-
+    btnToggleMenu() {
+        this.mobileNavState.toggleMenu();
+    }
 }

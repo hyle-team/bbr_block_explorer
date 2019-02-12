@@ -1,12 +1,15 @@
 @import '../assets/styles/base/mixins';
+
 nav.mobile_nav {
   height: 0;
   transition: 0.25s;
   overflow: hidden;
   opacity: 0;
   display: none;
+
   ul {
     width: 100%;
+
     li {
       > a {
         display: flex;
@@ -16,16 +19,28 @@ nav.mobile_nav {
         color: #3a3a3a;
         padding: 0 15px;
         margin: 10px 0;
+
         &.active {
           background-color: #007cde;
           color: #fff;
           font-weight: 400;
         }
       }
-      &:first-child{ > a {margin-top: 0;} }
-      &:last-child { > a {margin-bottom: 0;} }
+
+      &:first-child {
+        > a {
+          margin-top: 0;
+        }
+      }
+
+      &:last-child {
+        > a {
+          margin-bottom: 0;
+        }
+      }
     }
   }
+
   &.show {
     display: flex;
     height: 125px;

@@ -1,4 +1,5 @@
 @import '../../assets/styles/base/mixins';
+
 :host {
   display: flex;
   height: 36px;
@@ -9,10 +10,12 @@
     max-width: 100%;
     border-color: transparent;
   }
+
   > input, button {
     border: none;
     background-color: transparent;
   }
+
   > input {
     width: 340px;
     height: 100%;
@@ -21,9 +24,20 @@
     font-size: 14px;
     margin-right: 15px;
     padding-left: 12px;
-    &::-webkit-input-placeholder {color: #3a3a3a;}
-    &::-moz-placeholder {color: #3a3a3a; opacity: 1;}
-    &::-ms-input-placeholder {color: #3a3a3a;}
+
+    &::-webkit-input-placeholder {
+      color: #3a3a3a;
+    }
+
+    &::-moz-placeholder {
+      color: #3a3a3a;
+      opacity: 1;
+    }
+
+    &::-ms-input-placeholder {
+      color: #3a3a3a;
+    }
+
     @include max1170 {
       width: 245px;
     }

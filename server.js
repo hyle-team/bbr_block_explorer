@@ -28,7 +28,6 @@ function get_blocks_details(start, count, callback) {
     transformResponse: [data  => JSONbig.parse(data)]
   })
   .then(function (response) {
-    // console.log(response.data.result);
     callback(200, response.data);
   })
   .catch(function (error) {
@@ -36,8 +35,6 @@ function get_blocks_details(start, count, callback) {
     callback(400, error);
   });
 }
-
-// get_blocks_details(13008, 1);
 
 function get_alt_blocks_details(offset, count, callback) {
   axios({
@@ -103,7 +100,6 @@ function get_pool_txs_details(ids, callback) {
     log('POST get_pool_txs_details failed');
     callback(400, error);
   });
-
 }
 
 
@@ -124,10 +120,7 @@ function get_info(callback) {
     log('POST getinfo failed');
     callback(400, error);
   });
-
 }
-
-
 
 function get_tx_details(tx_hash, callback) {
   axios({
@@ -170,7 +163,6 @@ function get_out_info(amount, i, callback) {
 
 http.createServer(function (req, res) {
   log('request: ' + req.url);
-
 
   var auth = req.headers['authorization'];
   console.log("Authorization Header is: ", auth);
@@ -316,7 +308,7 @@ http.createServer(function (req, res) {
       } else if (req.url === '/get_info') {
         res.writeHead(200, headers);
         blockInfo.lastBlock = lastBlock.height;
-        res.end(JSON.stringify(blockInfo));
+        res.end(JSONbig.stringify(blockInfo));
       } else if (req.url === '/get_tx_details') {
         var body = [];
         req.on('data', function (chunk) {
@@ -555,23 +547,17 @@ db.serialize(function () {
     ", actual_timestamp INTEGER" +
     ", base_reward TEXT" +
     ", block_cumulative_size INTEGER" +
-    ", cumulative_diff_adjusted TEXT" +
-    ", cumulative_diff_precise TEXT" +
     ", difficulty TEXT" +
-    ", effective_fee_median TEXT" +
     ", id TEXT" +
     ", is_orphan INTEGER" +
     ", penalty TEXT" +
     ", prev_id TEXT" +
     ", summary_reward TEXT" +
-    ", this_block_fee_median TEXT" +
     ", timestamp INTEGER" +
     ", total_fee TEXT" +
     ", total_txs_size INTEGER" +
     ", tr_count INTEGER" +
-    ", type INTEGER" +
     ", miner_text_info TEXT" +
-    ", pow_seed TEXT" +
     ");");
 
   db.run("CREATE INDEX if not exists index_bl_height ON blocks(height);");
@@ -611,22 +597,16 @@ db.serialize(function () {
     'actual_timestamp INTEGER,' +
     'size INTEGER,' +
     'hash TEXT,' +
-    'type INTEGER,' +
     'difficulty TEXT,' +
-    'cumulative_diff_adjusted TEXT,' +
-    'cumulative_diff_precise TEXT,' +
     'is_orphan INTEGER,' +
     'base_reward TEXT,' +
     'total_fee TEXT,' +
     'penalty TEXT,' +
     'summary_reward TEXT,' +
     'block_cumulative_size INTEGER,' +
-    'this_block_fee_median TEXT,' +
-    'effective_fee_median TEXT,' +
     'total_txs_size INTEGER,' +
     'transactions_details TEXT,' +
-    'miner_txt_info TEXT,' +
-    'pow_seed TEXT' +
+    'miner_txt_info TEXT' +
     ');');
 
   db.run("CREATE INDEX if not exists index_ab_hash ON alt_blocks(hash);");
@@ -795,29 +775,23 @@ function syncTransactions(success) {
       if (localBl.tr_out.length === 0) {
         db.serialize(function () {
           db.run("begin transaction");
-          var stmt = db.prepare("INSERT INTO blocks VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+          var stmt = db.prepare("INSERT INTO blocks VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
           stmt.run(
             localBl.height,
             localBl.actual_timestamp,
-            localBl.base_reward,
+            localBl.base_reward.toString(),
             localBl.block_cumulative_size,
-            localBl.cumulative_diff_adjusted.toString(),
-            localBl.cumulative_diff_precise.toString(),
             localBl.difficulty.toString(),
-            localBl.effective_fee_median,
             localBl.id,
             localBl.is_orphan,
             localBl.penalty,
             localBl.prev_id,
-            localBl.summary_reward,
-            localBl.this_block_fee_median,
+            localBl.summary_reward.toString(),
             localBl.timestamp,
             localBl.total_fee.toString(),
             localBl.total_txs_size,
             (localBl.tr_count) ? localBl.tr_count : 0,
-            localBl.type,
-            localBl.miner_text_info,
-            localBl.pow_seed
+            localBl.miner_text_info
           );
           stmt.finalize();
           lastBlock = block_array.splice(0, 1)[0];
@@ -990,51 +964,39 @@ function syncAltBlocks() {
     if (code === 200) {
 
       db.serialize(function () {
-        var stmt = db.prepare('INSERT INTO alt_blocks VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+        var stmt = db.prepare('INSERT INTO alt_blocks VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
         for (var x in data.result.blocks) {
           var height = data.result.blocks[x].height;
           var timestamp = data.result.blocks[x].timestamp;
           var actual_timestamp = data.result.blocks[x].actual_timestamp;
           var size = data.result.blocks[x].block_cumulative_size;
           var hash = data.result.blocks[x].id;
-          var type = data.result.blocks[x].type;
           var difficulty = data.result.blocks[x].difficulty.toString();
-          var cumulative_diff_adjusted = data.result.blocks[x].cumulative_diff_adjusted.toString();
-          var cumulative_diff_precise = data.result.blocks[x].cumulative_diff_precise.toString();
           var is_orphan = data.result.blocks[x].is_orphan;
-          var base_reward = data.result.blocks[x].base_reward;
+          var base_reward = data.result.blocks[x].base_reward.toString();
           var total_fee = data.result.blocks[x].total_fee.toString();
           var penalty = data.result.blocks[x].penalty;
-          var summary_reward = data.result.blocks[x].summary_reward;
+          var summary_reward = data.result.blocks[x].summary_reward.toString();
           var block_cumulative_size = data.result.blocks[x].block_cumulative_size;
-          var this_block_fee_median = data.result.blocks[x].this_block_fee_median;
-          var effective_fee_median = data.result.blocks[x].effective_fee_median;
           var total_txs_size = data.result.blocks[x].total_txs_size;
           var transact_details = JSON.stringify(data.result.blocks[x].transactions_details);
           var miner_txt_info = data.result.blocks[x].miner_text_info;
-          var pow_seed  = data.result.blocks[x].pow_seed ;
           stmt.run(
             height,
             timestamp,
             actual_timestamp,
             size,
             hash,
-            type,
             difficulty,
-            cumulative_diff_adjusted,
-            cumulative_diff_precise,
             is_orphan,
             base_reward,
             total_fee,
             penalty,
             summary_reward,
             block_cumulative_size,
-            this_block_fee_median,
-            effective_fee_median,
             total_txs_size,
             transact_details,
-            miner_txt_info,
-            pow_seed
+            miner_txt_info
           );
         }
         stmt.finalize();
@@ -1054,6 +1016,7 @@ function getInfoTimer() {
     get_info(function (code, body) {
       if (code === 200) {
         blockInfo = body.result;
+        blockInfo.already_generated_coins = blockInfo.already_generated_coins.toString();
         countAliasesServer = blockInfo.alias_count;
         countAltBlocksServer = blockInfo.alt_blocks_count;
 

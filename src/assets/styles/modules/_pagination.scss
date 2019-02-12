@@ -68,10 +68,10 @@
   }
   &.trans_pool {
     input  {
-      max-width: 17px;
       transition: 0.25s;
+      margin-right: 10px;
       &:active, &:focus {
-        max-width: 30px;
+        //max-width: 30px;
       }
     }
     .of {

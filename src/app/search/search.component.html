@@ -1,6 +1,6 @@
 <input type="text" [ngClass]="{'show': isVisibleInput === true}"
        (keydown.enter)="onKeydown($event)"
-       [value] ="setSearch"
+       [value]="setSearch"
        (input)="setSearch=$event.target.value"
        placeholder="block height / block hash / transaction hash">
 <button class="run_search" (click)="searchFunc()"></button>

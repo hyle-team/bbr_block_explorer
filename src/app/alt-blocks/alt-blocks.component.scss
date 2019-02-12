@@ -1,5 +1,6 @@
 @import '../../assets/styles/base/mixins';
 @import '../../assets/styles/base/variables';
+
 .wrapper_table {
   overflow: hidden;
   margin-bottom: 15px;
@@ -7,13 +8,16 @@
     overflow-x: auto;
   }
 }
+
 .table_alt_blocks {
   table-layout: auto;
   width: 100%;
   white-space: nowrap;
+
   .hash {
     width: 100%;
-    white-space:nowrap;
+    white-space: nowrap;
+
     .cont_hash {
       position: relative;
       max-width: 100%;
@@ -22,12 +26,14 @@
       display: -moz-flex;
       display: flex;
       vertical-align: text-bottom !important;
+
       &:after {
         content: '-';
         display: inline;
         visibility: hidden;
         width: 0;
       }
+
       > a {
         color: $link;
         position: absolute;
@@ -38,7 +44,7 @@
         -o-text-overflow: ellipsis;
         max-width: 100%;
         min-width: 0;
-        width:100%;
+        width: 100%;
         top: 0;
         left: 0;
 
@@ -60,6 +66,7 @@
 
   }
 }
+
 .pagination {
   @include max761 {
     min-width: 850px;

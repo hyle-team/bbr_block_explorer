@@ -1,15 +1,3 @@
-// special font - (svg icons)(
-@font-face {
-  font-family: "untitled-font-1";
-  src: url("assets/fonts/untitled-font-1.eot");
-  src: url("assets/fonts/untitled-font-1.eot?#iefix") format("embedded-opentype"),
-       url("assets/fonts/untitled-font-1.woff") format("woff"),
-       url("assets/fonts/untitled-font-1.ttf") format("truetype"),
-       url("assets/fonts/untitled-font-1.svg#untitled-font-1") format("svg");
-  font-weight: normal;
-  font-style: normal;
-}
-
 // path variables
 $logo: url('assets/img/logo.svg');
 $mobileMenuIco: url('assets/img/menu.svg');
@@ -18,22 +6,8 @@ $search: url('./assets/img/search-general.svg');
 $backBtn: url('./assets/img/back-block.svg');
 $searchSecond: url('./assets/img/search-second.svg');
 $headingBG: url('./assets/img/head_backgr.png');
+$closeIco: url('./assets/img/close.svg');
 
-.base-icon {
-  display: inline-block;
-  font-size: 49px;
-  position: relative;
-  &:before {
-    font-family: 'untitled-font-1';
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1;
-    text-transform: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    position: absolute;
-  }
-}
 
 // BASE
 @import 'assets/styles/base/null';
@@ -53,6 +27,15 @@ $headingBG: url('./assets/img/head_backgr.png');
 @import 'assets/styles/modules/loader';
 @import 'assets/styles/modules/block-details';
 
+// popup
+.dialog__close-btn {
+  background-image: $closeIco;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+.dialog-open {
+  overflow: hidden;
+}
 
 .bg_heading {
   background-image: $headingBG;
@@ -126,10 +109,6 @@ app-search {
   @include max761 {
     font-size: 16px;
   }
-}
-
-.dialog-open {
-  overflow: hidden;
 }
 
 // webkit visible scroll
