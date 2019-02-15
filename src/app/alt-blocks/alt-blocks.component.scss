@@ -13,7 +13,9 @@
   table-layout: auto;
   width: 100%;
   white-space: nowrap;
-
+  thead th {
+    color: #fff;
+  }
   .hash {
     width: 100%;
     white-space: nowrap;

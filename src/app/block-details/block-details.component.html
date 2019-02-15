@@ -38,7 +38,7 @@
     <div *ngIf="BlockNotFound === false; else elseBlock">
         <div class="block_details">
 
-            <div class="heading_block">
+            <div class="heading_block bg_heading">
                 <h2 class="currency_name">Boolberry block</h2>
                 <div class="height_block">
                     <a *ngIf="prevBlockId" class="prev_block" [routerLink]="['/block', prevBlockId]"

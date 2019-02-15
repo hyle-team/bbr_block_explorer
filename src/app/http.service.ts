@@ -121,6 +121,12 @@ export class HttpService {
             return response;
         });
     }
+    public getChart(chart: any) {
+        const URL = `${this.serverApi}/get_chart`;
+        return this.http.post(URL, JSON.stringify({chart: chart})).map((response) => {
+            return response;
+        });
+    }
 }
 
 

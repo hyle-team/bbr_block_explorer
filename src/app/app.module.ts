@@ -8,6 +8,9 @@ import {MomentModule} from 'angular2-moment';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {CookieService, CookieOptions} from 'angular2-cookie/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MatTooltipModule} from '@angular/material/tooltip'
+import {ChartModule} from 'angular-highcharts';
+import 'hammerjs';
 
 // Services
 import {HttpService} from './http.service';
@@ -36,6 +39,7 @@ import {TransactionComponent} from './transaction/transaction.component';
 import {DialogComponent} from './dialog/dialog.component';
 import {ServerErrorComponent} from './server-error/server-error.component';
 import {SearchComponent} from './search/search.component';
+import {ChartsComponent} from './charts/charts.component';
 
 
 @NgModule({
@@ -62,6 +66,7 @@ import {SearchComponent} from './search/search.component';
         TruncatePipe,
         TimeAgoPipe,
         SortByAlphabetPipe,
+        ChartsComponent,
     ],
     imports: [
         BrowserModule,
@@ -71,6 +76,8 @@ import {SearchComponent} from './search/search.component';
         BrowserAnimationsModule,
         MomentModule,
         MatProgressSpinnerModule,
+        MatTooltipModule,
+        ChartModule,
     ],
     providers: [
         HttpService,

@@ -38,7 +38,7 @@
 
     <div *ngIf="transactionNotFount === false; else elseBlock">
         <div class="transaction_details">
-            <div class="title_transaction">Transaction</div>
+            <div class="title_transaction bg_heading">Transaction</div>
 
             <table class="transaction_details">
                 <tr class="hash">
@@ -46,7 +46,10 @@
                     <td><span>{{Transaction?.id}}</span></td>
                 </tr>
                 <tr>
-                    <td>Amount</td>
+                    <td>
+                        Amount
+                        <button  type="button" class="btn_tooltip" matTooltip="Due to the ring signature base of Zano blockchain this value may differ from amount that you transferred." aria-label="Sample Tooltip" matTooltipPosition="below" matTooltipClass="tooltip"></button>
+                    </td>
                     <td>{{Transaction?.amount | moneyParse}}</td>
                 </tr>
                 <tr>
@@ -62,12 +65,14 @@
                     <td>{{confirmations | bitNumber}}</td>
                 </tr>
                 <tr class="one_time_public_key">
+                <tr class="one_time_public_key">
                     <td>One-time public key</td>
                     <td><span>{{Transaction?.pub_key}}</span></td>
                 </tr>
                 <tr>
                     <td>Mixin</td>
-                    <td>-</td>
+                    <td *ngIf="countMixin == undefined">0</td>
+                    <td *ngIf="countMixin">{{countMixin}}</td>
                 </tr>
                 <tr class="extra_items">
                     <td>Extra items</td>
@@ -163,30 +168,26 @@
                 </thead>
                 <tbody>
                 <tr *ngFor="let inConn of Inputs | slice:0:inputsLimit">
-                    <td class="_amount"><!-- Amount -->
+                    <td class="_amount">
                         <span>{{inConn.amount | moneyParse}}</span>
                     </td>
 
-                    <!-- Image/Multisig id-->
                     <td class="_image_multisig">
-                        <a *ngIf="ImageMultisig === 1"
-                           href="">{{inConn.kimage_or_ms_id + ' (ms-' + inConn.multisig_count + ')'}}</a>
+                        <a *ngIf="ImageMultisig === 1" href="">{{inConn.kimage_or_ms_id + ' (ms-' + inConn.multisig_count + ')'}}</a>
                         <span *ngIf="ImageMultisig === 2">{{inConn.kimage_or_ms_id}}</span>
                         <span *ngIf="ImageMultisig === 3">coinbase</span>
+                        <span *ngIf="keeperBlock === -1">{{inConn.kimage_or_ms_id}}</span>
                     </td>
 
-                    <!--Mixin count-->
+
                     <td class="_mixin_count">
-            <span *ngIf="inConn.global_indexes" class="has_indexes"
-                  (click)="showDialogMixinCount = !showDialogMixinCount"
-                  (click)="getConnectTransaction(inConn)">
-                  {{inConn.global_indexes.length}}
-            </span>
+                        <span *ngIf="inConn.global_indexes" class="has_indexes"
+                              (click)="showDialogMixinCount = !showDialogMixinCount; getConnectTransaction(inConn);">
+                              {{inConn.global_indexes.length}}
+                        </span>
                         <span *ngIf="!inConn.global_indexes">0</span>
                     </td>
 
-
-                    <!--Global Index-->
                     <td class="_global_index">
                         <span *ngIf="inConn.global_indexes?.length === 1" (click)="goToTransaction(inConn)"
                               class="has-indexes">{{inConn.global_indexes[0]}}</span>
@@ -204,7 +205,7 @@
 
 
         <app-dialog [(visible)]="showDialogMixinCount">
-            <div class="dialog_title">Global Index mixins({{mixinCount}}) for
+            <div class="dialog_title">Global Index mixins ({{mixinCount}}) for
                 amount {{connection?.amount | moneyParse}}</div>
             <div class="wrap_content">
                 <div *ngFor="let index of connection?.global_indexes" (click)="SetIndexItem(index)">
@@ -229,15 +230,14 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let item of Outputs | slice:0:outputsLimit"
-                    [class]="{'out-selected':($index==out_selected)}">
+                <tr *ngFor="let item of Outputs | slice:0:outputsLimit" [class]="{'out-selected':($index==out_selected)}">
                     <td class="_amount">
                         <span>{{item.amount | moneyParse}}</span>
                     </td>
                     <td class="_key">
-            <span *ngFor="let key of item.pub_keys">
-              {{ key }}
-            </span>
+                        <span *ngFor="let key of item.pub_keys">
+                          {{ key }}
+                        </span>
                         <span *ngIf="item.is_spent === true">[SPENT]</span>
                         <span *ngIf="item.minimum_sigs !== 0">({{item.minimum_sigs}})</span>
                     </td>

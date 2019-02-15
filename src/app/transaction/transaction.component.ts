@@ -50,6 +50,8 @@ export class TransactionComponent implements OnInit, OnDestroy {
     navIsOpen: boolean;
     searchIsOpen: boolean = false;
     ImageMultisig: number;
+    countMixin: any;
+    test: any;
 
     onIsVisible($event): void {
         this.searchIsOpen = $event;
@@ -87,47 +89,39 @@ export class TransactionComponent implements OnInit, OnDestroy {
             this.tx_hash = params['tx_hash'];
             this.subscription2 = this.httpService.getTransaction(params.tx_hash).subscribe(
                 data => {
+                    // keeperBlock: -1(Unconfirmed Transaction); >=0(Confirmed Transaction)
                     this.Transaction = data;
                     this.keeperBlock = this.Transaction.keeper_block;
+                    this.keeperBlock === -1 ? this.Inputs = this.Transaction.ins : this.Inputs = JSONbig.parse(this.Transaction.ins);
+                    this.keeperBlock === -1 ? this.Outputs = this.Transaction.outs : this.Outputs = JSONbig.parse(this.Transaction.outs);
+                    this.keeperBlock === -1 ? this.ExtraItem = this.Transaction.extra : this.ExtraItem = JSON.parse(this.Transaction.extra);
+
+                    // Inputs
+                    for (let inConn of this.Inputs) {
+                        let amount = inConn.amount.toString();
+                        let multisig = inConn.multisig_count;
+                        if (inConn.global_indexes) {
+                            this.countMixin = inConn.global_indexes.length;
+                        }
+                        if (parseInt(amount, 10) !== 0 && multisig > 0) {
+                            this.ImageMultisig = 1;
+                        } else if (parseInt(amount, 10) !== 0 && multisig === 0 && this.keeperBlock !== -1) {
+                            this.ImageMultisig = 2;
+                        } else if (parseInt(amount, 10) === 0) {
+                            this.ImageMultisig = 3;
+                        }
+                    }
                     if (this.keeperBlock >= 0) {
-                        // transaction confirmed
                         this.unconfirmed = false;
                         this.confirmations = self.info.height - this.keeperBlock;
                         this.blockHash = this.Transaction.block_hash;
                         this.blockTimestamp = this.Transaction.block_timestamp;
-
-                        this.ExtraItem = JSON.parse(this.Transaction.extra);
-
-                        console.log('this.Transaction.ins', this.Transaction.ins);
-
-                        // Inputs
-                        this.Inputs = JSONbig.parse(this.Transaction.ins);
-                        console.log('this.Inputs', this.Inputs);
-                        for (let inConn of this.Inputs) {
-                            let amount = inConn.amount.toString();
-                            let multisig = inConn.multisig_count;
-                            if (parseInt(amount, 10) !== 0 && multisig > 0) {
-                                this.ImageMultisig = 1;
-                            } else if (parseInt(amount, 10) !== 0 && multisig === 0) {
-                                this.ImageMultisig = 2;
-                            } else if (parseInt(amount, 10) === 0) {
-                                this.ImageMultisig = 3;
-                            }
-                        }
-
-                        // Outputs
-                        this.Outputs = JSONbig.parse(this.Transaction.outs);
                         if (this.Transaction.attachments) {
                             this.attachments = JSON.parse(this.Transaction.attachments);
                         }
                     } else if (this.keeperBlock === -1) {
-                        // transaction unconfirmed
                         this.unconfirmed = true;
                         this.confirmations = 0;
-
-                        this.ExtraItem = this.Transaction.extra;
-                        this.Inputs = this.Transaction.ins;
-                        this.Outputs = this.Transaction.outs;
                     } else {
                         this.router.navigate(['/'], {relativeTo: this.route});
                     }
@@ -152,6 +146,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
         this.subscription5 = this.httpService.getConnectTransaction(this.connection.amount, this.i).subscribe(
             data => {
                 this.ConnectTransaction = data;
+                this.link = this.ConnectTransaction.tx_id;
             },
             err => console.error(err)
         );

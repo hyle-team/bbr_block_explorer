@@ -1,3 +1,5 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
 // path variables
 $logo: url('assets/img/logo.svg');
 $mobileMenuIco: url('assets/img/menu.svg');
@@ -7,7 +9,7 @@ $backBtn: url('./assets/img/back-block.svg');
 $searchSecond: url('./assets/img/search-second.svg');
 $headingBG: url('./assets/img/head_backgr.png');
 $closeIco: url('./assets/img/close.svg');
-
+$btnTooltip: url('./assets/img/information.svg');
 
 // BASE
 @import 'assets/styles/base/null';
@@ -129,4 +131,26 @@ app-search {
 ::-webkit-scrollbar-track {
   border-radius: 10px;
   background-color: #ffffff;
+}
+
+.wrap_links_chart {
+  > button {
+    > span {
+    }
+  }
+}
+
+.btn_tooltip {
+  width: 15px;
+  height: 15px;
+  vertical-align: middle;
+  margin-left: 10px;
+  border: none;
+  background-color: transparent;
+  background-image: $btnTooltip;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.tooltip {
+  background-color: rgba(#007ee0, 1);
 }
