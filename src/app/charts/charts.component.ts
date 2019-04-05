@@ -3,7 +3,6 @@ import {Chart} from 'angular-highcharts';
 import {HttpService, MobileNavState} from '../http.service';
 import {Subscription} from 'rxjs/Subscription';
 
-// Temporary Workaround
 import HighchartsMoreModule from 'highcharts/highcharts-more';
 import NetworkgraphModule from 'highcharts/modules/networkgraph';
 import OrganizationModule from 'highcharts/modules/organization';
@@ -29,7 +28,7 @@ export class ChartsComponent implements OnInit, OnDestroy {
     InputArray: any;
     seriesData: any;
 
-    searchIsOpen: boolean;
+    searchIsOpen: boolean = false;
 
 
     static drawChart(titleText, yText, chartsData): Chart {
@@ -99,7 +98,6 @@ export class ChartsComponent implements OnInit, OnDestroy {
     constructor(private httpService: HttpService, private mobileNavState: MobileNavState) {
         this.navIsOpen = false;
         this.loader = true;
-        this.searchIsOpen = false;
     }
 
     ngOnInit() {
