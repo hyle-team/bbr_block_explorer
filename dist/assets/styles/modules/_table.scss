@@ -1,0 +1,72 @@
+//@import '~src/assets/styles/base/variables';
+
+
+.wrapper_table {
+  .table_title {
+    padding: 13px 24px;
+    padding-left: 0;
+    font-size: 16px;
+    //font-weight: 300;
+    color: #fff;
+    @include max991 {
+      padding: 12px 20px;
+    }
+  }
+}
+
+.no_data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 160px;
+  font-size: 22px;
+  font-weight: 300;
+  color: #3c3c3c;
+  background-color: #fff;
+}
+
+table {
+  width: 100%;
+  cursor: default;
+  thead {
+    background-color: #f5f5f5;
+    tr {
+      th {
+        font-size: 14px;
+        color: #3a3a3a;
+        font-weight: 600;
+        text-align: left;
+        padding: 12px 20px;
+        @include max1170 {
+          padding: 12px 15px;
+        }
+      }
+    }
+  }
+  tbody {
+    background-color: #fff;
+    tr {
+      border-bottom: 1px solid #e8e6e6;
+      td {
+        font-size: 14px;
+        color: #3a3a3a;
+        padding: 10px 20px;
+        white-space: nowrap;
+        @include max1170 {
+          padding: 12px 15px;
+        }
+        > a {
+          color: $link;
+        }
+        &.height {
+          > span {
+            color: #3a3a3a;
+            padding-left: 5px;
+          }
+        }
+      }
+      &.new-block {background-color: rgba(#ffebee, 1);}
+      &.select {background-color: rgba(#ffebee, 1);}
+    }
+  }
+}

@@ -1,0 +1,68 @@
+header {
+  height: 80px;
+
+  .container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: inherit;
+  }
+
+  #mobile-nav-btn {
+    display: none;
+    width: 22px;
+    height: 16px;
+    background-image: $mobileMenuIco;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-color: transparent;
+    border: none;
+    @include max761 {
+      display: flex;
+      position: absolute;
+      right: 15px;
+    }
+  }
+
+  nav {
+    @include max761 {
+      display: none;
+    }
+
+    ul {
+      display: flex;
+
+      > li {
+        margin-right: 45px;
+
+        > a {
+          font-size: 16px;
+          font-weight: 400;
+          color: #fff;
+
+          &.active {
+            color: #65ffe7;
+          }
+        }
+      }
+    }
+  }
+
+  .logo {
+    width: 170px;
+    height: 40px;
+    margin-right: 80px;
+    background-image: $logo;
+    background-repeat: no-repeat;
+    background-position: 0 center;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    cursor: pointer;
+    @include unSelect;
+    outline: none;
+    @include max575 {
+      margin-right: 10px;
+    }
+  }
+}
