@@ -1,0 +1,6 @@
+{
+
+  "mongodb": "mongodb://localhost:27017/boolberry",
+  "api":"http://127.0.0.1:10102",
+  "front_port":"8008"
+}
