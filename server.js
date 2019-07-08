@@ -935,6 +935,29 @@ app.get('/api/get_pool_txs_brief_details', (req, res) => {
             log('api get_pool_txs_details failed', error);
         });
 });
+app.get('/updateBlocks', (req, res) => {
+    blocksModel.find({updated: {$ne: true}}).limit(20000).exec().then(data => {
+        if (data) {
+        let promiseArray = []
+        data.forEach(block => {
+            promiseArray.push(
+                blocksModel.findOneAndUpdate({height: block._doc.height}, {
+                    $set: {
+                        difficulty: parseFloat(block._doc.difficulty),
+                        updated: true
+                    }
+                }).exec()
+            )
+        })
+        Promise.all(promiseArray).then(() => {
+            res.send(JSON.stringify('good'));
+        })
+    } else {
+            res.send(JSON.stringify('finished'));
+        }
+
+    })
+})
 
 app.get('/api/get_tx_details/:tx_hash', (req, res) => {
     let tx_hash = req.params.tx_hash;
