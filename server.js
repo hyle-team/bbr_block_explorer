@@ -628,7 +628,8 @@ app.get('/get_chart/:chart/:period', (req, res) => {
                         _id: '$newDate',
                         avgBlocks: {$avg: '$block_cumulative_size'}
                     }
-                }
+                },
+                {$sort: {'_id': 1}}
             ]).exec().then(data => {
                 const AvgBlockSize = [];
                 for (let i = 1; i < data.length; i++) {
@@ -647,7 +648,8 @@ app.get('/get_chart/:chart/:period', (req, res) => {
                         _id: '$newDate',
                         tr_count: {$avg: '$tr_count'}
                     }
-                }
+                },
+                {$sort: {'_id': 1}}
             ]).exec().then(data => {
                 const AvgTransPerBlock = [];
                 for (let i = 1; i < data.length; i++) {
@@ -690,7 +692,8 @@ app.get('/get_chart/:chart/:period', (req, res) => {
                         _id: '$newDate',
                         difficulty: {$avg: '$difficulty'}
                     }
-                }
+                },
+                {$sort: {'_id': 1}}
             ]).exec().then(data => {
                 const AvgTransPerBlock = [];
                 for (let i = 1; i < data.length; i++) {
@@ -720,7 +723,8 @@ app.get('/get_chart/:chart/:period', (req, res) => {
                         _id: '$newDate',
                         tr_count: {$sum: '$tr_count'}
                     }
-                }
+                },
+                {$sort: {'_id': 1}}
             ]).exec().then(data => {
                 const ConfirmTransactPerDay = [];
                 for (let i = 1; i < data.length; i++) {
