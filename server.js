@@ -709,16 +709,36 @@ app.get('/get_chart/:chart/:period', (req, res) => {
                 });
             });*/
         } else if (chart === 'ConfirmTransactPerDay') {
-            db.serialize(function () {
-                db.all("SELECT actual_timestamp as timestamp, SUM(tr_count) as tr_count FROM blocks GROUP BY strftime('%Y-%m-%d', datetime(actual_timestamp, 'unixepoch')) ORDER BY actual_timestamp;", function (err, rows) {
-                    // res.writeHead(200, headers);
-                    const ConfirmTransactPerDay = [];
-                    for (let i = 1; i < rows.length; i++) {
-                        ConfirmTransactPerDay.push([rows[i].timestamp * 1000, rows[i].tr_count]);
+            return blocksModel.aggregate([
+                {$project: {
+
+                        "newDate": {$dateToString: {format: "%Y-%m-%d", date: {$add:[new Date(0), {$multiply: ["$actual_timestamp", 1000]}]}}},
+                        "tr_count": "$tr_count"
+                    }},
+                {
+                    $group: {
+                        _id: '$newDate',
+                        tr_count: {$sum: '$tr_count'}
                     }
-                    res.send(JSON.stringify(ConfirmTransactPerDay));
-                });
-            });
+                }
+            ]).exec().then(data => {
+                const ConfirmTransactPerDay = [];
+                for (let i = 1; i < data.length; i++) {
+                    ConfirmTransactPerDay.push([new Date(data[i]._id).getTime(), data[i].tr_count]);
+                }
+                res.send(JSON.stringify(ConfirmTransactPerDay));
+            })
+
+            // db.serialize(function () {
+            //     db.all("SELECT actual_timestamp as timestamp, SUM(tr_count) as tr_count FROM blocks GROUP BY strftime('%Y-%m-%d', datetime(actual_timestamp, 'unixepoch')) ORDER BY actual_timestamp;", function (err, rows) {
+            //         // res.writeHead(200, headers);
+            //         const ConfirmTransactPerDay = [];
+            //         for (let i = 1; i < rows.length; i++) {
+            //             ConfirmTransactPerDay.push([rows[i].timestamp * 1000, rows[i].tr_count]);
+            //         }
+            //         res.send(JSON.stringify(ConfirmTransactPerDay));
+            //     });
+            // });
         }
     }
 
