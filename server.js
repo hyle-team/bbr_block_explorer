@@ -239,23 +239,23 @@ function syncBlocks(blockInfo, lastBlock) {
         var newBlocks = (data.result && data.result.blocks) ? data.result.blocks : [];
         if (newBlocks.length && lastBlock.id === newBlocks[0].prev_id) {
 
-            const funcs = newBlocks.map(newBlock => () => syncTransactions(newBlock))
-            return promiseSerial(funcs).then( result => {
-                now_blocks_sync = false;
-            }).catch(err => {
-                log('Error at syncBlocks[] => syncTransaction[]: ', err);
-
-            });
-
-            // let promiseArray = []
-            // for(let i=0; i<newBlocks.length; i++){
-            //     promiseArray.push(syncTransactions(newBlocks[i]))
+            // const funcs = newBlocks.map(newBlock => () => syncTransactions(newBlock))
+            // return promiseSerial(funcs).then( result => {
+            //     now_blocks_sync = false;
+            // }).catch(err => {
+            //     log('Error at syncBlocks[] => syncTransaction[]: ', err);
             //
-            // }
-            // return Promise.all(promiseArray).then(() => {
-            //     now_blocks_sync=false
-            //     return Promise.resolve()
-            // })
+            // });
+
+            let promiseArray = []
+            for(let i=0; i<newBlocks.length; i++){
+                promiseArray.push(syncTransactions(newBlocks[i]))
+
+            }
+            return Promise.all(promiseArray).then(() => {
+                now_blocks_sync=false
+                return Promise.resolve()
+            })
 
         }
     })
