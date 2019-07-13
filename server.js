@@ -257,6 +257,18 @@ function syncBlocks(blockInfo, lastBlock) {
                 return Promise.resolve()
             })
 
+        } else {
+            let deleteCount = 2000
+            let promiseArray = []
+            promiseArray.push(blocksModel.deleteMany({height: {$gt:parseInt(lastBlock.height)-deleteCount}}).exec())
+            promiseArray.push(chartsModel.deleteMany({height: {$gt: parseInt(lastBlock.height)-deleteCount}}).exec())
+            promiseArray.push(transactionsModel.deleteMany({keeper_block: {$gt: parseInt(lastBlock.height)-deleteCount}}).exec())
+            promiseArray.push(altBlocksModel.deleteMany({block: {$gt: parseInt(lastBlock.height)-deleteCount}}).exec())
+            promiseArray.push(outinfoModel.deleteMany({block: {$gt: parseInt(lastBlock.height)-deleteCount}}).exec())
+            Promise.all(promiseArray).then(() => {
+                now_blocks_sync = false
+                return Promise.resolve()
+            })
         }
     })
 }
