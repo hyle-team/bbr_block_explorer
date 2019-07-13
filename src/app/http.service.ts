@@ -58,6 +58,18 @@ export class HttpService {
         }
     }
 
+    getInfo(flag): Observable<Response> {
+        if (this.infoObj === undefined) {
+            const URL = `${this.serverApi}/api/get_info/`+flag;
+            return this.http.get(URL).map(response => {
+                this.infoObj = response;
+                return this.infoObj;
+            });
+        } else {
+            return this.infoObj;
+        }
+    }
+
     // BlockChain Page
     public getTxPoolDetails(limit: number) {
         const URL = `${this.serverApi}/get_tx_pool_details/` + limit;

@@ -40,6 +40,8 @@ import {DialogComponent} from './dialog/dialog.component';
 import {ServerErrorComponent} from './server-error/server-error.component';
 import {SearchComponent} from './search/search.component';
 import {ChartsComponent} from './charts/charts.component';
+import { ApiComponent } from './api/api.component';
+import {NgxJsonViewerModule} from 'ngx-json-viewer';
 
 
 @NgModule({
@@ -67,6 +69,7 @@ import {ChartsComponent} from './charts/charts.component';
         TimeAgoPipe,
         SortByAlphabetPipe,
         ChartsComponent,
+        ApiComponent,
     ],
     imports: [
         BrowserModule,
@@ -78,6 +81,7 @@ import {ChartsComponent} from './charts/charts.component';
         MatProgressSpinnerModule,
         MatTooltipModule,
         ChartModule,
+        NgxJsonViewerModule
     ],
     providers: [
         HttpService,
