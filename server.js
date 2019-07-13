@@ -193,7 +193,7 @@ function syncAltBlocks(countAltBlocksServer) {
     return altBlocksModel.deleteMany({}).exec().then(() => {
         return get_alt_blocks_details(0, countAltBlocksServer).then(altBlocks => {
             let promiseArray = []
-            for(let id in altBlocks) {
+            for(let id in altBlocks.result.blocks) {
                 promiseArray.push(
                     new altBlocksModel({
                         height:                     altBlocks.result.blocks[id].height,
