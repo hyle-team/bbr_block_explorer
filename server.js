@@ -170,12 +170,12 @@ function synchronizer() {
                 // console.log('blockinfo', blockInfo)
 
                 //synchronize alt-blocks
-                if(countAltBlocksServer > 0 && now_alt_blocks_sync === false ) {
+                /*if(countAltBlocksServer > 0 && now_alt_blocks_sync === false ) {
                     now_alt_blocks_sync = true;
                     syncAltBlocks(countAltBlocksServer).then(() => {
                         now_alt_blocks_sync = false;
                     })
-                }
+                }*/
                 // synchronize blocks
                 if (lastBlock.height !== blockInfo.height - 1 && now_blocks_sync === false) {
                     log("need update blocks db=" + lastBlock.height + ' server=' + blockInfo.height);
