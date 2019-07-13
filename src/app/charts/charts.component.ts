@@ -113,7 +113,7 @@ export class ChartsComponent implements OnInit, OnDestroy {
             this.chartSubscription.unsubscribe();
             this.loader = true;
         }
-        this.chartSubscription = this.httpService.getChart(this.activeChart).subscribe(data => {
+        this.chartSubscription = this.httpService.getChart(this.activeChart, '0').subscribe(data => {
                 this.InputArray = data;
                 this.seriesData = [{type: 'area', data: this.InputArray}];
                 if (this.activeChart === 'AvgBlockSize') {
