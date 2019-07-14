@@ -59,15 +59,10 @@ export class HttpService {
     }
 
     getInfo(flag): Observable<Response> {
-        if (this.infoObj === undefined) {
             const URL = `${this.serverApi}/api/get_info/`+flag;
             return this.http.get(URL).map(response => {
-                this.infoObj = response;
-                return this.infoObj;
+                return response;
             });
-        } else {
-            return this.infoObj;
-        }
     }
 
     // BlockChain Page
@@ -83,10 +78,21 @@ export class HttpService {
         return this.http.get(URL)
     }
 
+    public getBlockDetailsApi(start: number, limit: number) {
+        const URL = `${this.serverApi}/api/get_blocks_details/` + start + '/' + limit;
+        return this.http.get(URL)
+    }
+
     public getMainBlockDetails(id: any) {
         const URL = `${this.serverApi}/get_main_block_details/`+id;
         return this.http.get(URL).map(response => response);
     }
+
+    public getMainBlockDetailsApi(id: any) {
+        const URL = `${this.serverApi}/api/get_main_block_details/` + id;
+        return this.http.get(URL).map(response => response);
+    }
+
 
 
     // Alt-blocks Page
@@ -96,7 +102,11 @@ export class HttpService {
             return response;
         });
     }
-
+    public getAltBlocksFromJson() {
+        return this.http.get('./assets/json/altblocks.json').map((response) => {
+            return response;
+        });
+    }
     public getAltDetailBlock(id: any) {
         const URL = `${this.serverApi}/get_alt_block_details/` + id;
         return this.http.get(URL).map((response) => {
@@ -104,6 +114,21 @@ export class HttpService {
         });
     }
 
+    public getPoolTxsDetailsJson() {
+        return this.http.get('./assets/json/pooltx_details.json').map((response) => {
+            return response;
+        });
+    }
+    public getAllPoolTxListJson() {
+        return this.http.get('./assets/json/allpooltxList.json').map((response) => {
+            return response;
+        });
+    }
+    public getTxsDetailsJson() {
+        return this.http.get('./assets/json/txdetails.json').map((response) => {
+            return response;
+        });
+    }
     // Transaction Page
     public getTransaction(tx_hash: any) {
         const URL = `${this.serverApi}/get_tx_details/` + tx_hash;

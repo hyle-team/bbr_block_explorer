@@ -29,7 +29,7 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
-                <ngx-json-viewer [json]="getInfo"></ngx-json-viewer>
+                <ngx-json-viewer [json]="getInfo" [expanded]="false"></ngx-json-viewer>
             </div><!---->
         </div>
     </div>
@@ -51,9 +51,11 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
-            </div><!----></div>
+                <ngx-json-viewer [json]="blockdetails" [expanded]="false"></ngx-json-viewer>
+            </div>
+        </div>
     </div>
-    <div class="item_box">
+   <!-- <div class="item_box">
         <div class="heading bg_heading">Request a given block by hash</div>
         <div class="info">
             <div class="row method">
@@ -70,8 +72,9 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
-            </div><!----></div>
-    </div>
+                <ngx-json-viewer [json]="mainblockdetails"></ngx-json-viewer>
+            </div>&lt;!&ndash;&ndash;&gt;</div>
+    </div>-->
     <div class="item_box">
         <div class="heading bg_heading">Request Alt-blocks (offset and count)</div>
         <div class="info">
@@ -90,9 +93,10 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
+                <ngx-json-viewer [json]="altblockdetails" [expanded]="false"></ngx-json-viewer>
             </div><!----></div>
     </div>
-    <div class="item_box">
+    <!--<div class="item_box">
         <div class="heading bg_heading">Request a given Alt-block by hash</div>
         <div class="info">
             <div class="row method">
@@ -109,8 +113,8 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
-            </div><!----></div>
-    </div>
+            </div>&lt;!&ndash;&ndash;&gt;</div>
+    </div>-->
     <div class="item_box">
         <div class="heading bg_heading">Request transaction from the pool</div>
         <div class="info">
@@ -127,9 +131,10 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
+                <ngx-json-viewer [json]="pooltxsdetails" [expanded]="false"></ngx-json-viewer>
             </div><!----></div>
     </div>
-    <div class="item_box">
+    <!--<div class="item_box">
         <div class="heading bg_heading">Request brief information transactions from the pool</div>
         <div class="info">
             <div class="row method">
@@ -145,8 +150,8 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
-            </div><!----></div>
-    </div>
+            </div>&lt;!&ndash;&ndash;&gt;</div>
+    </div>-->
     <div class="item_box">
         <div class="heading bg_heading">Request IDs for all txs from the pool</div>
         <div class="info">
@@ -163,6 +168,7 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
+                <ngx-json-viewer [json]="allpooltxList" [expanded]="false"></ngx-json-viewer>
             </div><!----></div>
     </div>
     <div class="item_box">
@@ -181,6 +187,7 @@
             <div class="title">
                 <div class="toggler"></div>
                 JSON Response
+                <ngx-json-viewer [json]="txdetails" [expanded]="false"></ngx-json-viewer>
             </div><!---->
         </div>
     </div>

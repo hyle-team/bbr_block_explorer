@@ -409,9 +409,9 @@ const promiseSerial = funcs =>
         Promise.resolve([]))
 
 
-setInterval(() => {synchronizer()}, 10000);
+// setInterval(() => {synchronizer()}, 10000);
 
-//synchronizer()
+synchronizer()
 
 app.get('/get_info', (req, res) => {
     globalBlockInfo.lastBlock = globalLastBlock.height;
