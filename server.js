@@ -409,9 +409,9 @@ const promiseSerial = funcs =>
         Promise.resolve([]))
 
 
-setInterval(() => {synchronizer()}, 10000);
+// setInterval(() => {synchronizer()}, 10000);
 
-// synchronizer()
+synchronizer()
 
 app.get('/get_info', (req, res) => {
     globalBlockInfo.lastBlock = globalLastBlock.height;
@@ -446,6 +446,7 @@ app.get('/get_tx_pool_details/:count', (req, res) => {
 app.get('/get_main_block_details/:id', (req, res) => {
     let id = req.params.id;
     if (id) {
+        id = id.toLowerCase();
 
         Promise.all([ blocksModel.findOne({id: {$gt: id}}).sort({id:1}).limit(1).exec()
             .then(row => {
@@ -503,6 +504,7 @@ app.get('/get_alt_blocks_details/:offset/:count', (req, res) => {
 app.get('/get_alt_block_details/:id', (req, res) => {
     let id = req.params.id;
     if (id) {
+        id = id.toLowerCase();
         altBlocksModel.findOne({hash: id}).exec().then(row => {
             res.send(JSON.stringify(row._doc));
         })
@@ -512,6 +514,7 @@ app.get('/get_alt_block_details/:id', (req, res) => {
 app.get('/get_tx_details/:tx_hash', (req, res) => {
     let tx_hash = req.params.tx_hash;
     if (tx_hash) {
+        tx_hash = tx_hash.toLowerCase();
         transactionsModel.findOne({id: tx_hash}).exec().then(tx => {
             if (tx) {
                 blocksModel.findOne({height: tx._doc.keeper_block}).exec().then(block => {
@@ -768,6 +771,7 @@ app.get('/search_by_id/:id', (req, res) => {
     let id = req.params.id;
 
     if (id) {
+        id = id.toLowerCase();
         blocksModel.findOne({id: id}).exec().then(row => {
             if(!row) {
                 altBlocksModel.findOne({id: id}).exec().then(row => {
