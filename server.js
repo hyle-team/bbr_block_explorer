@@ -1019,12 +1019,12 @@ app.get('/api/get_tx_details/:tx_hash', (req, res) => {
 
 app.get('/api/total_supply', (req, res) => {
     return get_info().then(response => {
-        res.send(JSON.stringify(response.result.max_coins_supply/10000000000000))
+        res.send(JSON.stringify(response.result.max_coins_supply/1000000000000))
     })
 });
 app.get('/api/current_supply', (req, res) => {
     return get_info().then(response => {
-        res.send(JSON.stringify(response.result.already_generated_coins/10000000000000))
+        res.send(JSON.stringify(response.result.already_generated_coins/1000000000000))
     })
 });
 
