@@ -19,6 +19,7 @@ const poolModel = db.model('pool')
 const transactionsModel = db.model('transactions')
 let now_blocks_sync = false;
 let now_alt_blocks_sync = false;
+let now_pool_tx_sync = false;
 let globalLastBlock = {
     height: -1
 };
@@ -186,10 +187,64 @@ function synchronizer() {
                     })
                 }
 
+                if(now_pool_tx_sync === false) {
+                    now_pool_tx_sync = true;
+                    syncPool(countTrPoolServer).then(() => {
+                        now_pool_tx_sync = false;
+                    })
+                }
+
             })
 
         })
     //}
+}
+
+function syncPool(countTrPoolServer) {
+    if(countTrPoolServer === 0) {
+        return poolModel.deleteMany({}).exec();
+    } else {
+        return get_all_pool_tx_list().then(data => {
+            if(data.result.ids) {
+                let pools_array = (data.result.ids) ? data.result.ids : [];
+                return poolModel.deleteMany({id: {$nin: pools_array}}).exec().then(() => {
+                    return poolModel.find({}, {id: 1, _id: 0}).exec().then(data => {
+
+                        let db_pool_txs = data.map(item => {return item._doc.id});
+                        if(db_pool_txs) {
+                            pools_array = pools_array.filter(item => {
+                                return !db_pool_txs.includes(item);
+                            });
+                        }
+                        if(pools_array.length) {
+                            get_pool_txs_details(pools_array).then(data => {
+                                if (data.result && data.result.txs) {
+                                    let promiseArray = []
+                                    for (var x in data.result.txs) {
+                                        promiseArray.push(
+                                           new poolModel({
+                                                blob_size:  data.result.txs[x].blob_size,
+                                                fee:        data.result.txs[x].fee.toString(),
+                                                id:         data.result.txs[x].id,
+                                                timestamp:  data.result.txs[x].timestamp
+                                            }).save()
+                                        )
+                                    }
+                                    return Promise.all(promiseArray)
+                                } else {
+                                    return Promise.resolve();
+                                }
+                            })
+                        } else {
+                            return Promise.resolve();
+                        }
+                    })
+                })
+            } else {
+                return poolModel.deleteMany({}).exec();
+            }
+        })
+    }
 }
 
 function syncAltBlocks(countAltBlocksServer) {
@@ -409,9 +464,9 @@ const promiseSerial = funcs =>
         Promise.resolve([]))
 
 
-// setInterval(() => {synchronizer()}, 10000);
+setInterval(() => {synchronizer()}, 10000);
 
-synchronizer()
+// synchronizer()
 
 app.get('/get_info', (req, res) => {
     globalBlockInfo.lastBlock = globalLastBlock.height;
