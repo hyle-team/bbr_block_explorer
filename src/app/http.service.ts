@@ -16,7 +16,7 @@ export class HttpService {
 
     constructor(protected http: HttpClient, private router: Router) {
         if (!environment.production) {
-            this.serverApi = 'http://localhost:8008';
+            this.serverApi = 'https://explorer.boolberry.com';
         }
         const self = this;
 

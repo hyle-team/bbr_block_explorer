@@ -409,7 +409,7 @@ const promiseSerial = funcs =>
         Promise.resolve([]))
 
 
-// setInterval(() => {synchronizer()}, 10000);
+setInterval(() => {synchronizer()}, 10000);
 
 // synchronizer()
 
