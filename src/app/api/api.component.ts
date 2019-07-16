@@ -13,15 +13,19 @@ export class ApiComponent implements OnInit, OnDestroy {
     altblockdetails: any;
     pooltxsdetails: any;
     allpooltxList: any;
-    txdetails: any
+    txdetails: any;
+    total_supply: any;
+    current_supply: any;
     subscription1: Subscription;
     subscription2: Subscription;
     subscription3: Subscription;
     subscription4: Subscription;
     subscription5: Subscription;
     subscription6: Subscription;
+    subscription7: Subscription;
+    subscription8: Subscription;
   constructor(public service: HttpService) {
-      this.subscription1 = service.getInfo(4294967295).subscribe(data => {
+      this.subscription1 = service.getInfoAPI(4294967295).subscribe(data => {
           this.getInfo = data;
       })
       this.subscription2 = this.service.getBlockDetailsApi(15, 2).subscribe(data => {
@@ -39,6 +43,13 @@ export class ApiComponent implements OnInit, OnDestroy {
       this.subscription6 = this.service.getTxsDetailsJson().subscribe(data => {
           this.txdetails = data;
       })
+      this.subscription7 = this.service.getCurrentSupply().subscribe(data => {
+          this.current_supply = data;
+      })
+      this.subscription8 = this.service.getTotalSupply().subscribe(data => {
+          this.total_supply = data;
+          console.log(this.total_supply)
+      })
 
   }
   ngOnInit() {
@@ -48,5 +59,10 @@ export class ApiComponent implements OnInit, OnDestroy {
         if (this.subscription1) { this.subscription1.unsubscribe(); }
         if (this.subscription2) { this.subscription2.unsubscribe(); }
         if (this.subscription3) { this.subscription3.unsubscribe(); }
+        if (this.subscription4) { this.subscription3.unsubscribe(); }
+        if (this.subscription5) { this.subscription3.unsubscribe(); }
+        if (this.subscription6) { this.subscription3.unsubscribe(); }
+        if (this.subscription7) { this.subscription3.unsubscribe(); }
+        if (this.subscription8) { this.subscription3.unsubscribe(); }
     }
 }

@@ -58,7 +58,7 @@ export class HttpService {
         }
     }
 
-    getInfo(flag): Observable<Response> {
+    getInfoAPI(flag): Observable<Object> {
             const URL = `${this.serverApi}/api/get_info/`+flag;
             return this.http.get(URL).map(response => {
                 return response;
@@ -126,6 +126,18 @@ export class HttpService {
     }
     public getTxsDetailsJson() {
         return this.http.get('./assets/json/txdetails.json').map((response) => {
+            return response;
+        });
+    }
+    public getTotalSupply() {
+        const URL = `${this.serverApi}/api/total_supply`;
+        return this.http.get(URL).map((response) => {
+            return response;
+        });
+    }
+    public getCurrentSupply() {
+        const URL = `${this.serverApi}/api/current_supply`;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }

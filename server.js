@@ -411,7 +411,7 @@ const promiseSerial = funcs =>
 
 // setInterval(() => {synchronizer()}, 10000);
 
-synchronizer()
+// synchronizer()
 
 app.get('/get_info', (req, res) => {
     globalBlockInfo.lastBlock = globalLastBlock.height;
@@ -1015,6 +1015,17 @@ app.get('/api/get_tx_details/:tx_hash', (req, res) => {
         .catch(function (error) {
             log('api get_tx_details failed', error);
         });
+});
+
+app.get('/api/total_supply', (req, res) => {
+    return get_info().then(response => {
+        res.send(response.result.max_coins_supply/10000000000000)
+    })
+});
+app.get('/api/current_supply', (req, res) => {
+    return get_info().then(response => {
+        res.send(JSON.stringify(response.result.already_generated_coins/10000000000000))
+    })
 });
 
 app.use(function (req, res) {

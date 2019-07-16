@@ -27,9 +27,11 @@
         </div>
         <div class="response">
             <div class="title">
-                <div class="toggler"></div>
-                JSON Response
-                <ngx-json-viewer [json]="getInfo" [expanded]="false"></ngx-json-viewer>
+                <span data-toggle="collapse" data-target="#getinfo">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id = "getinfo" [json]="getInfo" [expanded]="false"></ngx-json-viewer>
             </div><!---->
         </div>
     </div>
@@ -49,9 +51,11 @@
         </div>
         <div class="response">
             <div class="title">
-                <div class="toggler"></div>
-                JSON Response
-                <ngx-json-viewer [json]="blockdetails" [expanded]="false"></ngx-json-viewer>
+                <span data-toggle="collapse" data-target="#blockdetails">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="blockdetails" [json]="blockdetails" [expanded]="false"></ngx-json-viewer>
             </div>
         </div>
     </div>
@@ -91,9 +95,11 @@
         </div>
         <div class="response">
             <div class="title">
-                <div class="toggler"></div>
-                JSON Response
-                <ngx-json-viewer [json]="altblockdetails" [expanded]="false"></ngx-json-viewer>
+                <span data-toggle="collapse" data-target="#altblocks">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer id="altblocks" class="collapse" [json]="altblockdetails" [expanded]="false"></ngx-json-viewer>
             </div><!----></div>
     </div>
     <!--<div class="item_box">
@@ -129,10 +135,13 @@
         </div>
         <div class="response">
             <div class="title">
-                <div class="toggler"></div>
-                JSON Response
-                <ngx-json-viewer [json]="pooltxsdetails" [expanded]="false"></ngx-json-viewer>
-            </div><!----></div>
+                 <span data-toggle="collapse" data-target="#pooltxsdetails">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer id="pooltxsdetails" class="collapse" [json]="pooltxsdetails" [expanded]="false"></ngx-json-viewer>
+            </div>
+        </div>
     </div>
     <!--<div class="item_box">
         <div class="heading bg_heading">Request brief information transactions from the pool</div>
@@ -166,9 +175,11 @@
         </div>
         <div class="response">
             <div class="title">
-                <div class="toggler"></div>
-                JSON Response
-                <ngx-json-viewer [json]="allpooltxList" [expanded]="false"></ngx-json-viewer>
+                <span data-toggle="collapse" data-target="#allpooltxList">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="allpooltxList" [json]="allpooltxList" [expanded]="false"></ngx-json-viewer>
             </div><!----></div>
     </div>
     <div class="item_box">
@@ -185,9 +196,55 @@
         </div>
         <div class="response">
             <div class="title">
-                <div class="toggler"></div>
-                JSON Response
-                <ngx-json-viewer [json]="txdetails" [expanded]="false"></ngx-json-viewer>
+                <span data-toggle="collapse" data-target="#txdetails">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="txdetails" [json]="txdetails" [expanded]="false"></ngx-json-viewer>
+            </div><!---->
+        </div>
+    </div>
+    <div class="item_box">
+        <div class="heading bg_heading">Current Supply</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">current_supply</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/current_supply</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#current_supply">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="current_supply" [json]="current_supply" [expanded]="false"></ngx-json-viewer>
+            </div><!---->
+        </div>
+    </div>
+    <div class="item_box">
+        <div class="heading bg_heading">Total Supply</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">total_supply</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/total_supply</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#total_supply">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="total_supply" [json]="total_supply" [expanded]="false"></ngx-json-viewer>
             </div><!---->
         </div>
     </div>
