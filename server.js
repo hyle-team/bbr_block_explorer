@@ -1024,7 +1024,7 @@ app.get('/api/total_supply', (req, res) => {
 });
 app.get('/api/current_supply', (req, res) => {
     return get_info().then(response => {
-        res.send(JSON.stringify(response.result.already_generated_coins/10000000000000))
+        res.send(response.result.already_generated_coins/10000000000000)
     })
 });
 
