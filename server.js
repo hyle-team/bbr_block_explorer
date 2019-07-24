@@ -18,6 +18,8 @@ const altBlocksModel = db.model('alt_blocks')
 const poolModel = db.model('pool')
 const transactionsModel = db.model('transactions')
 let now_blocks_sync = false;
+let now_alt_blocks_sync = false;
+let now_pool_tx_sync = false;
 let globalLastBlock = {
     height: -1
 };
@@ -147,8 +149,8 @@ function get_out_info(amount, i) {
     })
 }
 
-function Synchronizer() {
-    if(now_blocks_sync === false) {
+function synchronizer() {
+    //if(now_blocks_sync === false) {
         return get_info().then(data => {
             return blocksModel.find({}).sort({height:-1}).limit(1).exec().then(lastBlock => {
                 if(!lastBlock[0]) {
@@ -167,16 +169,120 @@ function Synchronizer() {
                 const countAltBlocksServer = blockInfo.alt_blocks_count;
                 const countTrPoolServer = blockInfo.tx_pool_size;
                 // console.log('blockinfo', blockInfo)
+
+                // synchronize blocks
                 if (lastBlock.height !== blockInfo.height - 1 && now_blocks_sync === false) {
                     log("need update blocks db=" + lastBlock.height + ' server=' + blockInfo.height);
                     // log("need update aliases db=" + countAliasesDB + ' server=' + countAliasesServer);
                     now_blocks_sync = true;
-                    return syncBlocks(blockInfo, lastBlock);
+                    syncBlocks(blockInfo, lastBlock);
                 }
+
+                //synchronize alt-blocks
+
+                if(countAltBlocksServer > 0 && now_alt_blocks_sync === false ) {
+                    now_alt_blocks_sync = true;
+                    syncAltBlocks(countAltBlocksServer).then(() => {
+                        now_alt_blocks_sync = false;
+                    })
+                }
+
+                if(now_pool_tx_sync === false) {
+                    now_pool_tx_sync = true;
+                    syncPool(countTrPoolServer).then(() => {
+                        now_pool_tx_sync = false;
+                    })
+                }
+
             })
 
         })
+    //}
+}
+
+function syncPool(countTrPoolServer) {
+    if(countTrPoolServer === 0) {
+        return poolModel.deleteMany({}).exec();
+    } else {
+        return get_all_pool_tx_list().then(data => {
+            if(data.result.ids) {
+                let pools_array = (data.result.ids) ? data.result.ids : [];
+                return poolModel.deleteMany({id: {$nin: pools_array}}).exec().then(() => {
+                    return poolModel.find({}, {id: 1, _id: 0}).exec().then(data => {
+
+                        let db_pool_txs = data.map(item => {return item._doc.id});
+                        if(db_pool_txs) {
+                            pools_array = pools_array.filter(item => {
+                                return !db_pool_txs.includes(item);
+                            });
+                        }
+                        if(pools_array.length) {
+                            get_pool_txs_details(pools_array).then(data => {
+                                if (data.result && data.result.txs) {
+                                    let promiseArray = []
+                                    for (var x in data.result.txs) {
+                                        promiseArray.push(
+                                           new poolModel({
+                                                blob_size:  data.result.txs[x].blob_size,
+                                                fee:        data.result.txs[x].fee.toString(),
+                                                id:         data.result.txs[x].id,
+                                                timestamp:  data.result.txs[x].timestamp
+                                            }).save()
+                                        )
+                                    }
+                                    return Promise.all(promiseArray)
+                                } else {
+                                    return Promise.resolve();
+                                }
+                            })
+                        } else {
+                            return Promise.resolve();
+                        }
+                    })
+                })
+            } else {
+                return poolModel.deleteMany({}).exec();
+            }
+        })
     }
+}
+
+function syncAltBlocks(countAltBlocksServer) {
+    return altBlocksModel.deleteMany({}).exec().then(() => {
+        return get_alt_blocks_details(0, countAltBlocksServer).then(altBlocks => {
+            let promiseArray = []
+            for(let id in altBlocks.result.blocks) {
+                promiseArray.push(
+                    new altBlocksModel({
+                        height:                     altBlocks.result.blocks[id].height,
+                        timestamp:                  altBlocks.result.blocks[id].timestamp,
+                        actual_timestamp:           altBlocks.result.blocks[id].actual_timestamp,
+                        size:                       altBlocks.result.blocks[id].block_cumulative_size,
+                        hash:                       altBlocks.result.blocks[id].id,
+                        difficulty:                 altBlocks.result.blocks[id].difficulty?altBlocks.result.blocks[id].difficulty.toString():"",
+                        cumulative_diff_adjusted:   altBlocks.result.blocks[id].cumulative_diff_adjusted ? altBlocks.result.blocks[id].cumulative_diff_adjusted.toString():"",
+                        cumulative_diff_precise:    altBlocks.result.blocks[id].cumulative_diff_precise?altBlocks.result.blocks[id].cumulative_diff_precise.toString():"",
+                        is_orphan:                  altBlocks.result.blocks[id].is_orphan,
+                        base_reward:                altBlocks.result.blocks[id].base_reward,
+                        total_fee:                  altBlocks.result.blocks[id].total_fee?altBlocks.result.blocks[id].total_fee.toString():"",
+                        penalty:                    altBlocks.result.blocks[id].penalty,
+                        summary_reward:             altBlocks.result.blocks[id].summary_reward,
+                        block_cumulative_size:      altBlocks.result.blocks[id].block_cumulative_size,
+                        this_block_fee_median:      altBlocks.result.blocks[id].this_block_fee_median,
+                        effective_fee_median:       altBlocks.result.blocks[id].effective_fee_median,
+                        total_txs_size:             altBlocks.result.blocks[id].total_txs_size,
+                        transactions_details:       JSON.stringify(altBlocks.result.blocks[id].transactions_details),
+                        miner_txt_info:             altBlocks.result.blocks[id].miner_text_info,
+                        pow_seed :''
+                    }).save()
+                )
+            }
+            return Promise.all(promiseArray).then(() => {
+                log('Alt blocks data updated with offset: '+countAltBlocksServer)
+                return Promise.resolve();
+            })
+        })
+    })
 }
 
 function syncBlocks(blockInfo, lastBlock) {
@@ -209,14 +315,21 @@ function syncBlocks(blockInfo, lastBlock) {
             //     return Promise.resolve()
             // })
 
+        } else {
+            let deleteCount = 2000
+            let promiseArray = []
+            promiseArray.push(blocksModel.deleteMany({height: {$gt:parseInt(lastBlock.height)-deleteCount}}).exec())
+            promiseArray.push(chartsModel.deleteMany({height: {$gt: parseInt(lastBlock.height)-deleteCount}}).exec())
+            promiseArray.push(transactionsModel.deleteMany({keeper_block: {$gt: parseInt(lastBlock.height)-deleteCount}}).exec())
+            promiseArray.push(altBlocksModel.deleteMany({block: {$gt: parseInt(lastBlock.height)-deleteCount}}).exec())
+            promiseArray.push(outinfoModel.deleteMany({block: {$gt: parseInt(lastBlock.height)-deleteCount}}).exec())
+            Promise.all(promiseArray).then(() => {
+                now_blocks_sync = false
+                return Promise.resolve()
+            })
         }
     })
 }
-
-const promiseSerial = funcs =>
-    funcs.reduce((promise, func) =>
-            promise.then(result => func().then(Array.prototype.concat.bind(result))),
-        Promise.resolve([]))
 
 function syncTransactions(newBlock) {
     const newBlockeEntity = new blocksModel({
@@ -327,19 +440,33 @@ function syncTransactions(newBlock) {
                             return Promise.resolve()
                         }).catch(err => {
                             log('Error, could not save new alias'+regAlias.alias, err)
-                            throw new Error('Error at data proceeding')
+                            throw new Error(err)
                         })
                     }
                 }
                 return Promise.resolve();
+            }).catch(err => {
+                throw new Error(err)
             })
         })
     }, err => {
         log('error happened in sync transaction', err)
-        return Promise.reject(err)
+        throw new Error(err)
+    }).catch(err => {
+        throw new Error(err)
     })
 }
-setInterval(() => {Synchronizer()}, 10000);
+
+
+const promiseSerial = funcs =>
+    funcs.reduce((promise, func) =>
+            promise.then(result => func().then(Array.prototype.concat.bind(result))),
+        Promise.resolve([]))
+
+
+setInterval(() => {synchronizer()}, 10000);
+
+// synchronizer()
 
 app.get('/get_info', (req, res) => {
     globalBlockInfo.lastBlock = globalLastBlock.height;
@@ -374,6 +501,7 @@ app.get('/get_tx_pool_details/:count', (req, res) => {
 app.get('/get_main_block_details/:id', (req, res) => {
     let id = req.params.id;
     if (id) {
+        id = id.toLowerCase();
 
         Promise.all([ blocksModel.findOne({id: {$gt: id}}).sort({id:1}).limit(1).exec()
             .then(row => {
@@ -431,6 +559,7 @@ app.get('/get_alt_blocks_details/:offset/:count', (req, res) => {
 app.get('/get_alt_block_details/:id', (req, res) => {
     let id = req.params.id;
     if (id) {
+        id = id.toLowerCase();
         altBlocksModel.findOne({hash: id}).exec().then(row => {
             res.send(JSON.stringify(row._doc));
         })
@@ -440,6 +569,7 @@ app.get('/get_alt_block_details/:id', (req, res) => {
 app.get('/get_tx_details/:tx_hash', (req, res) => {
     let tx_hash = req.params.tx_hash;
     if (tx_hash) {
+        tx_hash = tx_hash.toLowerCase();
         transactionsModel.findOne({id: tx_hash}).exec().then(tx => {
             if (tx) {
                 blocksModel.findOne({height: tx._doc.keeper_block}).exec().then(block => {
@@ -511,123 +641,192 @@ app.get('/get_aliases/:offset/:count/:search', (req, res) => {
     }
 });
 
-// app.get('/get_chart/:chart/:period', (req, res) => {
-//     let chart = req.params.chart;
-//     let period = req.params.period; // temporarily unused
-//
-//     if (chart !== undefined) {
-//         let period = Math.round(new Date().getTime() / 1000) - (24 * 3600); // + 86400000
-//         let period2 = Math.round(new Date().getTime() / 1000) - (48 * 3600); // + 86400000
-//         // if (params_object.period === 'day') {
-//         //   // period = parseInt((period.setDate(period.getDate() - 86400000)) / 1000);
-//         //   period = parseInt(period - 86400000) / 1000;
-//         //   console.log(period);
-//         // } else if (params_object.period === 'week') {
-//         //   period = parseInt((period.setDate(period.getDate()-7)) / 1000);
-//         // } else if (params_object.period === 'month') {
-//         //   period = parseInt((period.setMonth(period.getMonth()-1)) / 1000);
-//         // } else if (params_object.period === '3month') {
-//         //   period = parseInt((period.setMonth(period.getMonth()-3)) / 1000);
-//         // } else if (params_object.period === '6month') {
-//         //   period = parseInt((period.setMonth(period.getMonth()-6)) / 1000);
-//         // } else if (params_object.period === 'year') {
-//         //   period = parseInt((period.setMonth(period.getMonth()-12)) / 1000);
-//         // }
-//         if (chart === 'all') {
-//             // db.serialize(function () {
-//             //   // Charts AvgBlockSize, AvgTransPerBlock, difficultyPoS, difficultyPoW
-//             //   db.all("SELECT actual_timestamp as at, block_cumulative_size as bcs, tr_count as trc, difficulty as d, type as t FROM charts WHERE actual_timestamp > " + period, function (err, arrayAll) {
-//             //     if (err) {
-//             //       log('all charts error', err);
-//             //     } else {
-//             //       // Chart Confirmed Transactions Per Day
-//             //       db.all("SELECT actual_timestamp as at, SUM(tr_count) as sum_trc FROM charts GROUP BY strftime('%Y-%m-%d', datetime(actual_timestamp, 'unixepoch')) ORDER BY actual_timestamp;", function (err, rows0) {
-//             //         if (err) {
-//             //           log('all charts confirmed-transactions-per-day', err);
-//             //         } else {
-//             //           // Chart HashRate
-//             //           db.all("SELECT actual_timestamp as at, difficulty120 as d120, hashrate100 as h100, hashrate400 as h400 FROM charts WHERE type=1 AND actual_timestamp > " + period2, function (err, rows1) {
-//             //             if (err) {
-//             //               log('all hashrate', err);
-//             //             } else {
-//             //               arrayAll[0] = rows0;
-//             //               arrayAll[1] = rows1;
-//             //               res.send(JSON.stringify(arrayAll));
-//             //             }
-//             //           });
-//             //         }
-//             //       });
-//             //     }
-//             //   });
-//             // });
-//         } else if (chart === 'AvgBlockSize') {
-//             db.serialize(function () {
-//                 db.all("SELECT strftime('%s', date(actual_timestamp, 'unixepoch')) as timestamp, avg(block_cumulative_size) as block_cumulative_size from blocks GROUP BY date(actual_timestamp, 'unixepoch');", function (err, rows) {
-//                     // res.writeHead(200, headers);
-//                     const AvgBlockSize = [];
-//                     for (let i = 1; i < rows.length; i++) {
-//                         AvgBlockSize.push([rows[i].timestamp * 1000, rows[i].block_cumulative_size]);
-//                     }
-//                     res.send(JSON.stringify(AvgBlockSize));
-//                 });
-//             });
-//         } else if (chart === 'AvgTransPerBlock') {
-//             db.serialize(function () {
-//                 db.all("select strftime('%s', date(actual_timestamp, 'unixepoch')) as timestamp, avg(tr_count) as tr_count from blocks GROUP BY date(actual_timestamp, 'unixepoch');", function (err, rows) {
-//                     // res.writeHead(200, headers);
-//                     const AvgTransPerBlock = [];
-//                     for (let i = 1; i < rows.length; i++) {
-//                         AvgTransPerBlock.push([rows[i].timestamp * 1000, rows[i].tr_count]);
-//                     }
-//                     res.send(JSON.stringify(AvgTransPerBlock));
-//                 });
-//             });
-//         } else if (chart === 'hashRate') {
-//             // db.serialize(function () {
-//             //   db.all("SELECT actual_timestamp as at, difficulty120 as d120, hashrate100 as h100, hashrate400 as h400 FROM charts WHERE type=1", function (err, rows) {
-//             //     if (err) {
-//             //       log('hashrate', err);
-//             //     } else {
-//             //       // for (let i = 0; i < rows.length; i++) {
-//             //       //     rows[i]['hashrate100'] = (i > 99) ? ((rows[i]['cumulative_diff_precise'] - rows[i - 100]['cumulative_diff_precise']) / (rows[i]['actual_timestamp'] - rows[i - 100]['actual_timestamp'])) : 0;
-//             //       //     rows[i]['hashrate400'] = (i > 399) ? ((rows[i]['cumulative_diff_precise'] - rows[i - 400]['cumulative_diff_precise']) / (rows[i]['actual_timestamp'] - rows[i - 400]['actual_timestamp'])) : 0;
-//             //       // }
-//             //       res.send(JSON.stringify(rows));
-//             //     }
-//             //   });
-//             // });
-//         } else if (chart === 'difficulty') {
-//             db.serialize(function () {
-//                 db.all("SELECT strftime('%s', date(actual_timestamp, 'unixepoch')) as timestamp, avg(difficulty) as difficulty FROM blocks GROUP BY strftime('%Y-%m-%d', datetime(actual_timestamp, 'unixepoch')) ORDER BY actual_timestamp;", function (err, rows) {
-//                     // res.writeHead(200, headers);
-//                     const difficultyArray = [];
-//                     for (let i = 1; i < rows.length; i++) {
-//                         difficultyArray.push([rows[i].timestamp * 1000, parseInt(rows[i].difficulty)]);
-//                     }
-//                     res.send(JSON.stringify(difficultyArray));
-//                 });
-//             });
-//         } else if (chart === 'ConfirmTransactPerDay') {
-//             db.serialize(function () {
-//                 db.all("SELECT actual_timestamp as timestamp, SUM(tr_count) as tr_count FROM blocks GROUP BY strftime('%Y-%m-%d', datetime(actual_timestamp, 'unixepoch')) ORDER BY actual_timestamp;", function (err, rows) {
-//                     // res.writeHead(200, headers);
-//                     const ConfirmTransactPerDay = [];
-//                     for (let i = 1; i < rows.length; i++) {
-//                         ConfirmTransactPerDay.push([rows[i].timestamp * 1000, rows[i].tr_count]);
-//                     }
-//                     res.send(JSON.stringify(ConfirmTransactPerDay));
-//                 });
-//             });
-//         }
-//     }
-//
-//
-// });
+app.get('/get_chart/:chart/:period', (req, res) => {
+    let chart = req.params.chart;
+    let period = req.params.period; // temporarily unused
+
+    if (chart !== undefined) {
+        let period = Math.round(new Date().getTime() / 1000) - (24 * 3600); // + 86400000
+        let period2 = Math.round(new Date().getTime() / 1000) - (48 * 3600); // + 86400000
+        // if (params_object.period === 'day') {
+        //   // period = parseInt((period.setDate(period.getDate() - 86400000)) / 1000);
+        //   period = parseInt(period - 86400000) / 1000;
+        //   console.log(period);
+        // } else if (params_object.period === 'week') {
+        //   period = parseInt((period.setDate(period.getDate()-7)) / 1000);
+        // } else if (params_object.period === 'month') {
+        //   period = parseInt((period.setMonth(period.getMonth()-1)) / 1000);
+        // } else if (params_object.period === '3month') {
+        //   period = parseInt((period.setMonth(period.getMonth()-3)) / 1000);
+        // } else if (params_object.period === '6month') {
+        //   period = parseInt((period.setMonth(period.getMonth()-6)) / 1000);
+        // } else if (params_object.period === 'year') {
+        //   period = parseInt((period.setMonth(period.getMonth()-12)) / 1000);
+        // }
+        if (chart === 'all') {
+            // db.serialize(function () {
+            //   // Charts AvgBlockSize, AvgTransPerBlock, difficultyPoS, difficultyPoW
+            //   db.all("SELECT actual_timestamp as at, block_cumulative_size as bcs, tr_count as trc, difficulty as d, type as t FROM charts WHERE actual_timestamp > " + period, function (err, arrayAll) {
+            //     if (err) {
+            //       log('all charts error', err);
+            //     } else {
+            //       // Chart Confirmed Transactions Per Day
+            //       db.all("SELECT actual_timestamp as at, SUM(tr_count) as sum_trc FROM charts GROUP BY strftime('%Y-%m-%d', datetime(actual_timestamp, 'unixepoch')) ORDER BY actual_timestamp;", function (err, rows0) {
+            //         if (err) {
+            //           log('all charts confirmed-transactions-per-day', err);
+            //         } else {
+            //           // Chart HashRate
+            //           db.all("SELECT actual_timestamp as at, difficulty120 as d120, hashrate100 as h100, hashrate400 as h400 FROM charts WHERE type=1 AND actual_timestamp > " + period2, function (err, rows1) {
+            //             if (err) {
+            //               log('all hashrate', err);
+            //             } else {
+            //               arrayAll[0] = rows0;
+            //               arrayAll[1] = rows1;
+            //               res.send(JSON.stringify(arrayAll));
+            //             }
+            //           });
+            //         }
+            //       });
+            //     }
+            //   });
+            // });
+        } else if (chart === 'AvgBlockSize') {
+            return blocksModel.aggregate([
+                {$project: {
+                        "newDate": {$dateToString: {format: "%Y-%m-%d", date: {$add:[new Date(0), {$multiply: ["$actual_timestamp", 1000]}]}}},
+                        "block_cumulative_size": "$block_cumulative_size"
+                    }},
+                {
+                    $group: {
+                        _id: '$newDate',
+                        avgBlocks: {$avg: '$block_cumulative_size'}
+                    }
+                },
+                {$sort: {'_id': 1}}
+            ]).exec().then(data => {
+                const AvgBlockSize = [];
+                for (let i = 1; i < data.length; i++) {
+                        AvgBlockSize.push([new Date(data[i]._id).getTime(), data[i].avgBlocks]);
+                }
+                res.send(JSON.stringify(AvgBlockSize));
+            })
+        } else if (chart === 'AvgTransPerBlock') {
+            return blocksModel.aggregate([
+                {$project: {
+                        "newDate": {$dateToString: {format: "%Y-%m-%d", date: {$add:[new Date(0), {$multiply: ["$actual_timestamp", 1000]}]}}},
+                        "tr_count": "$tr_count"
+                    }},
+                {
+                    $group: {
+                        _id: '$newDate',
+                        tr_count: {$avg: '$tr_count'}
+                    }
+                },
+                {$sort: {'_id': 1}}
+            ]).exec().then(data => {
+                const AvgTransPerBlock = [];
+                for (let i = 1; i < data.length; i++) {
+                    AvgTransPerBlock.push([new Date(data[i]._id).getTime(), data[i].tr_count]);
+                }
+                res.send(JSON.stringify(AvgTransPerBlock));
+            })
+            /*db.serialize(function () {
+                db.all("select strftime('%s', date(actual_timestamp, 'unixepoch')) as timestamp, avg(tr_count) as tr_count from blocks GROUP BY date(actual_timestamp, 'unixepoch');", function (err, rows) {
+                    // res.writeHead(200, headers);
+                    const AvgTransPerBlock = [];
+                    for (let i = 1; i < rows.length; i++) {
+                        AvgTransPerBlock.push([rows[i].timestamp * 1000, rows[i].tr_count]);
+                    }
+                    res.send(JSON.stringify(AvgTransPerBlock));
+                });
+            });*/
+        } else if (chart === 'hashRate') {
+            // db.serialize(function () {
+            //   db.all("SELECT actual_timestamp as at, difficulty120 as d120, hashrate100 as h100, hashrate400 as h400 FROM charts WHERE type=1", function (err, rows) {
+            //     if (err) {
+            //       log('hashrate', err);
+            //     } else {
+            //       // for (let i = 0; i < rows.length; i++) {
+            //       //     rows[i]['hashrate100'] = (i > 99) ? ((rows[i]['cumulative_diff_precise'] - rows[i - 100]['cumulative_diff_precise']) / (rows[i]['actual_timestamp'] - rows[i - 100]['actual_timestamp'])) : 0;
+            //       //     rows[i]['hashrate400'] = (i > 399) ? ((rows[i]['cumulative_diff_precise'] - rows[i - 400]['cumulative_diff_precise']) / (rows[i]['actual_timestamp'] - rows[i - 400]['actual_timestamp'])) : 0;
+            //       // }
+            //       res.send(JSON.stringify(rows));
+            //     }
+            //   });
+            // });
+        } else if (chart === 'difficulty') {
+            return blocksModel.aggregate([
+                {$project: {
+                        "newDate": {$dateToString: {format: "%Y-%m-%d", date: {$add:[new Date(0), {$multiply: ["$actual_timestamp", 1000]}]}}},
+                        "difficulty": "$difficulty"
+                    }},
+                {
+                    $group: {
+                        _id: '$newDate',
+                        difficulty: {$avg: '$difficulty'}
+                    }
+                },
+                {$sort: {'_id': 1}}
+            ]).exec().then(data => {
+                const AvgTransPerBlock = [];
+                for (let i = 1; i < data.length; i++) {
+                    AvgTransPerBlock.push([new Date(data[i]._id).getTime(), data[i].difficulty]);
+                }
+                res.send(JSON.stringify(AvgTransPerBlock));
+            })
+            /*db.serialize(function () {
+                db.all("SELECT strftime('%s', date(actual_timestamp, 'unixepoch')) as timestamp, avg(difficulty) as difficulty FROM blocks GROUP BY strftime('%Y-%m-%d', datetime(actual_timestamp, 'unixepoch')) ORDER BY actual_timestamp;", function (err, rows) {
+                    // res.writeHead(200, headers);
+                    const difficultyArray = [];
+                    for (let i = 1; i < rows.length; i++) {
+                        difficultyArray.push([rows[i].timestamp * 1000, parseInt(rows[i].difficulty)]);
+                    }
+                    res.send(JSON.stringify(difficultyArray));
+                });
+            });*/
+        } else if (chart === 'ConfirmTransactPerDay') {
+            return blocksModel.aggregate([
+                {$project: {
+
+                        "newDate": {$dateToString: {format: "%Y-%m-%d", date: {$add:[new Date(0), {$multiply: ["$actual_timestamp", 1000]}]}}},
+                        "tr_count": "$tr_count"
+                    }},
+                {
+                    $group: {
+                        _id: '$newDate',
+                        tr_count: {$sum: '$tr_count'}
+                    }
+                },
+                {$sort: {'_id': 1}}
+            ]).exec().then(data => {
+                const ConfirmTransactPerDay = [];
+                for (let i = 1; i < data.length; i++) {
+                    ConfirmTransactPerDay.push([new Date(data[i]._id).getTime(), data[i].tr_count]);
+                }
+                res.send(JSON.stringify(ConfirmTransactPerDay));
+            })
+
+            // db.serialize(function () {
+            //     db.all("SELECT actual_timestamp as timestamp, SUM(tr_count) as tr_count FROM blocks GROUP BY strftime('%Y-%m-%d', datetime(actual_timestamp, 'unixepoch')) ORDER BY actual_timestamp;", function (err, rows) {
+            //         // res.writeHead(200, headers);
+            //         const ConfirmTransactPerDay = [];
+            //         for (let i = 1; i < rows.length; i++) {
+            //             ConfirmTransactPerDay.push([rows[i].timestamp * 1000, rows[i].tr_count]);
+            //         }
+            //         res.send(JSON.stringify(ConfirmTransactPerDay));
+            //     });
+            // });
+        }
+    }
+
+
+});
 
 app.get('/search_by_id/:id', (req, res) => {
     let id = req.params.id;
 
     if (id) {
+        id = id.toLowerCase();
         blocksModel.findOne({id: id}).exec().then(row => {
             if(!row) {
                 altBlocksModel.findOne({id: id}).exec().then(row => {
@@ -677,6 +876,23 @@ app.get('/api/get_info/:flags', (req, res) => {
             log('api get_info', error);
         });
 });
+
+app.get('/api/get_all_alias_details/', (req, res) => {
+    axios({
+        method: 'get',
+        url: api,
+        data: {
+            method: 'get_all_alias_details',
+        },
+        transformResponse: [data => JSONbig.parse(data)]
+    })
+        .then((response) => {
+            res.send(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+            log('api get_info', error);
+        });
+})
 
 app.get('/api/get_blocks_details/:start/:count', (req, res) => {
     let start = req.params.start;
@@ -817,6 +1033,29 @@ app.get('/api/get_pool_txs_brief_details', (req, res) => {
             log('api get_pool_txs_details failed', error);
         });
 });
+app.get('/updateBlocks', (req, res) => {
+    blocksModel.find({updated: {$ne: true}}).limit(20000).exec().then(data => {
+        if (data) {
+        let promiseArray = []
+        data.forEach(block => {
+            promiseArray.push(
+                blocksModel.findOneAndUpdate({height: block._doc.height}, {
+                    $set: {
+                        difficulty: parseFloat(block._doc.difficulty),
+                        updated: true
+                    }
+                }).exec()
+            )
+        })
+        Promise.all(promiseArray).then(() => {
+            res.send(JSON.stringify('good'));
+        })
+    } else {
+            res.send(JSON.stringify('finished'));
+        }
+
+    })
+})
 
 app.get('/api/get_tx_details/:tx_hash', (req, res) => {
     let tx_hash = req.params.tx_hash;
@@ -835,6 +1074,17 @@ app.get('/api/get_tx_details/:tx_hash', (req, res) => {
         .catch(function (error) {
             log('api get_tx_details failed', error);
         });
+});
+
+app.get('/api/total_supply', (req, res) => {
+    return get_info().then(response => {
+        res.send(JSON.stringify(response.result.max_coins_supply/1000000000000))
+    })
+});
+app.get('/api/current_supply', (req, res) => {
+    return get_info().then(response => {
+        res.send(JSON.stringify(response.result.already_generated_coins/1000000000000))
+    })
 });
 
 app.use(function (req, res) {

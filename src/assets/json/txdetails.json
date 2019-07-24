@@ -1,0 +1,111 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "status": "OK",
+    "tx_info": {
+      "amount": 15129924000000,
+      "blob": "",
+      "blob_size": 393,
+      "extra": [
+        {
+          "datails_view": "",
+          "short_view": "d6a502ae0d9d38005fefccea708ca60756793904f4533a17411d976fb6449b3a",
+          "type": "pub_key"
+        },
+        {
+          "datails_view": "",
+          "short_view": "302e332e302e343128616263646561622d6469727479290000000027a6023500",
+          "type": "user_data"
+        }
+      ],
+      "fee": 0,
+      "id": "2f7009959fe8be1944b33ada12c75ca2706ebd22fdf97b589348504721f881e4",
+      "ins": [
+        {
+          "amount": 0,
+          "kimage_or_ms_id": "",
+          "multisig_count": 0
+        }
+      ],
+      "keeper_block": 147566,
+      "object_in_json": "",
+      "outs": [
+        {
+          "amount": 4000000,
+          "global_index": 14780,
+          "is_spent": true,
+          "minimum_sigs": 0,
+          "pub_keys": [
+            "e4d63f080041dd8be74428057194569041b97024c3e51819e77e650771ef0db4"
+          ]
+        },
+        {
+          "amount": 20000000,
+          "global_index": 14795,
+          "is_spent": true,
+          "minimum_sigs": 0,
+          "pub_keys": [
+            "c15154624a51ab19238cefdfe44f49284b8325c5b4778a19e6452436b34b8808"
+          ]
+        },
+        {
+          "amount": 900000000,
+          "global_index": 16633,
+          "is_spent": false,
+          "minimum_sigs": 0,
+          "pub_keys": [
+            "33364fda72744dfdcc74f3995d4440ce14f4c40f146b90cbec246b09d53ee41c"
+          ]
+        },
+        {
+          "amount": 9000000000,
+          "global_index": 29736,
+          "is_spent": false,
+          "minimum_sigs": 0,
+          "pub_keys": [
+            "a6544ca573d0fb589e24c0225c180651eaac7fed1f2cdb9353305f35f5df6935"
+          ]
+        },
+        {
+          "amount": 20000000000,
+          "global_index": 16513,
+          "is_spent": false,
+          "minimum_sigs": 0,
+          "pub_keys": [
+            "20fbf472d79e6a14a60260ec01768693e2e7610cc049187df495a1b4e7f8339f"
+          ]
+        },
+        {
+          "amount": 100000000000,
+          "global_index": 319935,
+          "is_spent": false,
+          "minimum_sigs": 0,
+          "pub_keys": [
+            "7f1f08d1c9b483d6ebb24fd5d1f39c766b710b1a50bd1b6762ea38e4f8c45646"
+          ]
+        },
+        {
+          "amount": 5000000000000,
+          "global_index": 69355,
+          "is_spent": false,
+          "minimum_sigs": 0,
+          "pub_keys": [
+            "ca49a8899e4d665b14d6cf19c46b919738320c7b831ad2574ffc0297c0e9dd37"
+          ]
+        },
+        {
+          "amount": 10000000000000,
+          "global_index": 160009,
+          "is_spent": false,
+          "minimum_sigs": 0,
+          "pub_keys": [
+            "5f13096267f5e9d85174a66779b32fb7f802b7744c080ef96ce19f63cf62f4f5"
+          ]
+        }
+      ],
+      "pub_key": "d6a502ae0d9d38005fefccea708ca60756793904f4533a17411d976fb6449b3a",
+      "timestamp": 1418194408
+    }
+  }
+}

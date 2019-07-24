@@ -58,72 +58,122 @@ export class HttpService {
         }
     }
 
+    getInfoAPI(flag): Observable<Object> {
+            const URL = `${this.serverApi}/api/get_info/`+flag;
+            return this.http.get(URL).map(response => {
+                return response;
+            });
+    }
+
     // BlockChain Page
     public getTxPoolDetails(limit: number) {
-        const URL = `${this.serverApi}/get_tx_pool_details`;
-        return this.http.post(URL, JSON.stringify({count: limit})).map((response) => {
+        const URL = `${this.serverApi}/get_tx_pool_details/` + limit;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }
 
     public getBlockDetails(start: number, limit: number) {
-        const URL = `${this.serverApi}/get_blocks_details`;
-        return this.http.post(URL, JSON.stringify({start: start, count: limit}))
+        const URL = `${this.serverApi}/get_blocks_details/` + start + '/' + limit;
+        return this.http.get(URL)
+    }
+
+    public getBlockDetailsApi(start: number, limit: number) {
+        const URL = `${this.serverApi}/api/get_blocks_details/` + start + '/' + limit;
+        return this.http.get(URL)
     }
 
     public getMainBlockDetails(id: any) {
-        const URL = `${this.serverApi}/get_main_block_details`;
-        return this.http.post(URL, JSON.stringify({id: id})).map(response => response);
+        const URL = `${this.serverApi}/get_main_block_details/`+id;
+        return this.http.get(URL).map(response => response);
     }
+
+    public getMainBlockDetailsApi(id: any) {
+        const URL = `${this.serverApi}/api/get_main_block_details/` + id;
+        return this.http.get(URL).map(response => response);
+    }
+
 
 
     // Alt-blocks Page
     public getAltBlocks(offset: number, count: number) {
-        const URL = `${this.serverApi}/get_alt_blocks_details`;
-        return this.http.post(URL, JSON.stringify({offset: offset, count: count})).map((response) => {
+        const URL = `${this.serverApi}/get_alt_blocks_details/` + offset + '/' + count;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }
-
+    public getAltBlocksFromJson() {
+        return this.http.get('./assets/json/altblocks.json').map((response) => {
+            return response;
+        });
+    }
     public getAltDetailBlock(id: any) {
-        const URL = `${this.serverApi}/get_alt_block_details`;
-        return this.http.post(URL, JSON.stringify({id: id})).map((response) => {
+        const URL = `${this.serverApi}/get_alt_block_details/` + id;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }
 
+    public getPoolTxsDetailsJson() {
+        return this.http.get('./assets/json/pooltx_details.json').map((response) => {
+            return response;
+        });
+    }
+    public getAllPoolTxListJson() {
+        return this.http.get('./assets/json/allpooltxList.json').map((response) => {
+            return response;
+        });
+    }
+    public getTxsDetailsJson() {
+        return this.http.get('./assets/json/txdetails.json').map((response) => {
+            return response;
+        });
+    }
+    public getTotalSupply() {
+        const URL = `${this.serverApi}/api/total_supply`;
+        return this.http.get(URL).map((response) => {
+            return response;
+        });
+    }
+    public getCurrentSupply() {
+        const URL = `${this.serverApi}/api/current_supply`;
+        return this.http.get(URL).map((response) => {
+            return response;
+        });
+    }
     // Transaction Page
     public getTransaction(tx_hash: any) {
-        const URL = `${this.serverApi}/get_tx_details`;
-        return this.http.post(URL, JSON.stringify({tx_hash: tx_hash})).map((response) => {
+        const URL = `${this.serverApi}/get_tx_details/` + tx_hash;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }
 
     public getConnectTransaction(amount, i) {
-        const URL = `${this.serverApi}/get_out_info`;
-        return this.http.post(URL, JSON.stringify({amount: amount, i: i})).map((response) => {
+        const URL = `${this.serverApi}/get_out_info/` + amount + '/' + i;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }
 
     // Aliases Page
     public getAliases(offset: number, count: number, search: any) {
-        const URL = `${this.serverApi}/get_aliases`;
-        return this.http.post(URL, JSON.stringify({offset: offset, count: count, search: search})).map((response) => {
+        if (!search) search = 'all'
+        const URL = `${this.serverApi}/get_aliases/` + offset + '/' + count + '/' + search;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }
 
     public searchById(search: any) {
-        const URL = `${this.serverApi}/search_by_id`;
-        return this.http.post(URL, JSON.stringify({id: search})).map((response) => {
+        const URL = `${this.serverApi}/search_by_id/` + search;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }
-    public getChart(chart: any) {
-        const URL = `${this.serverApi}/get_chart`;
-        return this.http.post(URL, JSON.stringify({chart: chart})).map((response) => {
+    public getChart(chart: any, period: any) {
+        const URL = `${this.serverApi}/get_chart/` + chart + '/' + period;
+        return this.http.get(URL).map((response) => {
             return response;
         });
     }

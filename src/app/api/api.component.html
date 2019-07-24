@@ -1,0 +1,251 @@
+<div class="container">
+    <div class="head_page">API Documentation</div>
+    <div class="item_box">
+        <div class="heading bg_heading">How to use</div>
+        <div class="info">
+            <div class="row">
+                <div class="title">API ENDPOINT</div>
+                <div class="value">https://explorer.boolberry.com/api/</div>
+            </div>
+            <div class="row">
+                <div class="title">URL Request Format</div>
+                <div class="value">https://explorer.boolberry.com/api/{{ '{' }}method}/{{ '{' }}param1{{ '}' }}/{{ '{' }}param2{{ '}' }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="item_box">
+        <div class="heading bg_heading">Request current coin stats</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_info</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/get_info/4294967295</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#getinfo">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id = "getinfo" [json]="getInfo" [expanded]="false"></ngx-json-viewer>
+            </div><!---->
+        </div>
+    </div>
+    <div class="item_box">
+        <div class="heading bg_heading">Request blocks (offset and count)</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_blocks_details</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">
+                    https://explorer.boolberry.com/api/get_blocks_details/{{ '{' }}:offset{{ '}' }}/{{ '{' }}:count{{ '}' }}
+                </div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#blockdetails">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="blockdetails" [json]="blockdetails" [expanded]="false"></ngx-json-viewer>
+            </div>
+        </div>
+    </div>
+   <!-- <div class="item_box">
+        <div class="heading bg_heading">Request a given block by hash</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_main_block_details</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/get_main_block_details/{{ '{' }}:hash{{ '}' }}
+                </div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <div class="toggler"></div>
+                JSON Response
+                <ngx-json-viewer [json]="mainblockdetails"></ngx-json-viewer>
+            </div>&lt;!&ndash;&ndash;&gt;</div>
+    </div>-->
+    <div class="item_box">
+        <div class="heading bg_heading">Request Alt-blocks (offset and count)</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_alt_blocks_details</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">
+                    https://explorer.boolberry.com/api/get_alt_blocks_details/{{ '{' }}:offset{{ '}' }}/{{ '{' }}:count{{ '}' }}
+                </div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#altblocks">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer id="altblocks" class="collapse" [json]="altblockdetails" [expanded]="false"></ngx-json-viewer>
+            </div><!----></div>
+    </div>
+    <!--<div class="item_box">
+        <div class="heading bg_heading">Request a given Alt-block by hash</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_alt_block_details</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/get_alt_block_details/{{ '{' }}:hash{{ '}' }}
+                </div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <div class="toggler"></div>
+                JSON Response
+            </div>&lt;!&ndash;&ndash;&gt;</div>
+    </div>-->
+    <div class="item_box">
+        <div class="heading bg_heading">Request transaction from the pool</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_pool_txs_details</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/get_pool_txs_details</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                 <span data-toggle="collapse" data-target="#pooltxsdetails">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer id="pooltxsdetails" class="collapse" [json]="pooltxsdetails" [expanded]="false"></ngx-json-viewer>
+            </div>
+        </div>
+    </div>
+    <!--<div class="item_box">
+        <div class="heading bg_heading">Request brief information transactions from the pool</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_pool_txs_brief_details</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/get_pool_txs_brief_details</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <div class="toggler"></div>
+                JSON Response
+            </div>&lt;!&ndash;&ndash;&gt;</div>
+    </div>-->
+    <div class="item_box">
+        <div class="heading bg_heading">Request IDs for all txs from the pool</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_all_pool_tx_list</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/get_all_pool_tx_list</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#allpooltxList">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="allpooltxList" [json]="allpooltxList" [expanded]="false"></ngx-json-viewer>
+            </div><!----></div>
+    </div>
+    <div class="item_box">
+        <div class="heading bg_heading">Request a given transaction by hash</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">get_tx_details</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/get_tx_details/{{ '{' }}:tx_hash{{ '}' }}</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#txdetails">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="txdetails" [json]="txdetails" [expanded]="false"></ngx-json-viewer>
+            </div><!---->
+        </div>
+    </div>
+    <div class="item_box">
+        <div class="heading bg_heading">Current Supply</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">current_supply</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/current_supply</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#current_supply">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="current_supply" [json]="current_supply" [expanded]="false"></ngx-json-viewer>
+            </div><!---->
+        </div>
+    </div>
+    <div class="item_box">
+        <div class="heading bg_heading">Total Supply</div>
+        <div class="info">
+            <div class="row method">
+                <div class="title">Method:</div>
+                <div class="value">total_supply</div>
+            </div>
+            <div class="row">
+                <div class="title">Example:</div>
+                <div class="value">https://explorer.boolberry.com/api/total_supply</div>
+            </div>
+        </div>
+        <div class="response">
+            <div class="title">
+                <span data-toggle="collapse" data-target="#total_supply">
+                    <div class="toggler"></div>
+                    JSON Response
+                </span>
+                <ngx-json-viewer class="collapse" id="total_supply" [json]="total_supply" [expanded]="false"></ngx-json-viewer>
+            </div><!---->
+        </div>
+    </div>
+</div>

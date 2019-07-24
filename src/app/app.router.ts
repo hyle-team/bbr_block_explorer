@@ -13,6 +13,7 @@ import {ServerErrorComponent} from './server-error/server-error.component'
 
 // Resolve
 import {ServiceResolver, ResolveAltBlock} from './http.service';
+import {ApiComponent} from './api/api.component';
 
 export const router: Routes = [
     {
@@ -58,6 +59,10 @@ export const router: Routes = [
     {
         path: 'charts',
         component: ChartsComponent,
+    },
+    {
+        path: 'api',
+        component: ApiComponent,
     },
     {
         path: 'server-error',

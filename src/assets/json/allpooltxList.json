@@ -1,0 +1,11 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "ids": [
+      "313f363308ec6e5ada8e2c7b5faec8a41ccebf87b0a5adcf978af080d2669f32",
+      "7300c0ac204304e068f5f7ea813974a557cd174193ac81253f5b1d17cbc32a43"
+    ],
+    "status": "OK"
+  }
+}

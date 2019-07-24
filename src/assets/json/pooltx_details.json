@@ -1,0 +1,20 @@
+{
+  "id": 0,
+  "jsonrpc": "2.0",
+  "result": {
+    "status": "OK",
+    "txs": [
+      {
+        "amount": 8000000000000,
+        "blob": "",
+        "blob_size": 599,
+        "fee": 2000000000,
+        "id": "51dfffbd3ddf7995fca151d43a3a3a2803855ef14a2013c1285d61c509265e50",
+        "keeper_block": 0,
+        "object_in_json": "",
+        "pub_key": "08eb0c74321738524d3e8a9d0ec9c2fb8fc04a3b6f779dfed9069a3adc23f9b5",
+        "timestamp": 1563140841
+      }
+    ]
+  }
+}
